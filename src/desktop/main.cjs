@@ -126,7 +126,7 @@ function createWindow() {
   });
   window.webContents.on('will-navigate', event => event.preventDefault());
   window.webContents.on('will-attach-webview', event => event.preventDefault());
-  session.webRequest.onHeadersReceived((details, callback) => callback({ responseHeaders: { ...details.responseHeaders, 'Content-Security-Policy': ["default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self' data:; connect-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'none'"] } }));
+  session.webRequest.onHeadersReceived((details, callback) => callback({ responseHeaders: { ...details.responseHeaders, 'Content-Security-Policy': ["default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://raw.githubusercontent.com/libretro-thumbnails/; media-src 'self' blob:; font-src 'self' data:; connect-src 'self' https://api.github.com/repos/libretro-thumbnails/ https://raw.githubusercontent.com/libretro-thumbnails/; frame-src 'none'; object-src 'none'; base-uri 'none'"] } }));
   void window.loadFile(indexFile);
 }
 

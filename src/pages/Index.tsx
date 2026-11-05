@@ -3,6 +3,7 @@ import { AddEmulationApp } from "@/components/AddEmulationApp";
 import { DirectoryImport } from "@/components/DirectoryImport";
 import { GamesLibrary } from "@/components/GamesLibrary";
 import { GameEditor } from "@/components/GameEditor";
+import { GameCoverMenu } from "@/components/GameCoverMenu";
 import { CartridgeArtwork } from "@/components/CartridgeArtwork";
 import { StartMenu } from "@/components/StartMenu";
 import { AppearanceSettings, type BackgroundMedia } from "@/components/AppearanceSettings";
@@ -29,6 +30,7 @@ const Index = () => {
   const [showGameImport, setShowGameImport] = useState(false);
   const [libraryTab, setLibraryTab] = useState("apps");
   const [editingGame, setEditingGame] = useState<LibraryGame>();
+  const [coverGame, setCoverGame] = useState<LibraryGame>();
   const [games, setGames] = useState<LibraryGame[]>([]);
   const [editing, setEditing] = useState<EmulationApp>();
   const [artworkApp, setArtworkApp] = useState<EmulationApp>();
@@ -176,7 +178,7 @@ const Index = () => {
             <TabsTrigger value="games" className="flex-1 flex-wrap gap-2 rounded-xl border-2 border-transparent px-3 py-3 text-xs text-blue-100 data-[state=active]:border-yellow-300 data-[state=active]:bg-yellow-300 data-[state=active]:text-blue-950 sm:px-5 sm:text-sm"><Gamepad2 className="h-5 w-5" />Games <span className="font-mono">({games.length})</span></TabsTrigger>
           </TabsList>
           <TabsContent value="apps" className="mt-0"><EmulationAppList apps={apps} onEdit={handleEdit} onArtwork={setArtworkApp} onDelete={handleDelete} onOpen={handleOpen} onLaunch={handleLaunch} launchingAppId={launchingAppId} onToggleFavorite={handleToggleFavorite} /></TabsContent>
-          <TabsContent value="games" className="mt-0"><GamesLibrary games={games} onImport={() => setShowGameImport(true)} onEdit={setEditingGame} onRemove={id => setGames(current => current.filter(game => game.id !== id))} /></TabsContent>
+          <TabsContent value="games" className="mt-0"><GamesLibrary games={games} onImport={() => setShowGameImport(true)} onEdit={setEditingGame} onCover={setCoverGame} onRemove={id => setGames(current => current.filter(game => game.id !== id))} /></TabsContent>
         </Tabs>
       </main>}
       <footer className="console-footer relative z-10 flex flex-wrap items-center justify-center gap-6 px-4 py-5 text-xs"><span className="flex items-center gap-2"><Gamepad2 className="h-6 w-6 text-slate-300" /> {started ? "Your apps & games" : "Choose your next adventure"}</span><span className="flex items-center gap-2"><Star className="h-5 w-5 fill-yellow-400 text-yellow-400" /> {apps.length} apps · {games.length} games</span></footer>
@@ -188,6 +190,11 @@ const Index = () => {
         setGames(current => current.map(entry => entry.id === game.id ? game : entry));
         setEditingGame(undefined);
         toast.success("Game updated!");
+      }} />}
+      {coverGame && <GameCoverMenu game={coverGame} upload={upload} onClose={() => setCoverGame(undefined)} onSave={artwork => {
+        setGames(current => current.map(game => game.id === coverGame.id ? { ...game, artwork } : game));
+        setCoverGame(undefined);
+        toast.success(artwork ? "Game cover updated!" : "Game cover removed.");
       }} />}
       {artworkApp && <CartridgeArtwork app={artworkApp} upload={upload} onClose={() => setArtworkApp(undefined)} onSave={artwork => {
         setApps(prev => prev.map(app => app.id === artworkApp.id ? { ...app, artwork } : app));
