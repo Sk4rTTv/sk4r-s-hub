@@ -5,12 +5,12 @@ export interface EmulationApp {
   icon: string;
   color: string;
   artwork?: string;
+  url?: string;
   status: "installed" | "not-installed" | "favorite";
-  lastPlayed?: string;
-  playtimeHours?: number;
 }
 
 export const SYSTEMS = [
+  "Multi-system",
   "NES",
   "SNES",
   "Nintendo 64",

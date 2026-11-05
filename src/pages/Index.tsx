@@ -2,7 +2,6 @@ import { EmulationAppList } from "@/components/EmulationAppList";
 import { AddEmulationApp } from "@/components/AddEmulationApp";
 import { AppearanceSettings, type BackgroundMedia } from "@/components/AppearanceSettings";
 import { EmulationApp } from "@/types/emulation";
-import { SAMPLE_APPS } from "@/data/apps";
 import { Plus, Star, Gamepad2, ImagePlus, Volume2, VolumeX, Pause, Play } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -13,7 +12,7 @@ import "@/retro.css";
 const Index = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editing, setEditing] = useState<EmulationApp>();
-  const [apps, setApps] = useState<EmulationApp[]>(SAMPLE_APPS);
+  const [apps, setApps] = useState<EmulationApp[]>([]);
   const [showSettings, setShowSettings] = useState(false);
   const [background, setBackground] = useState<BackgroundMedia | null>(null);
   const [dim, setDim] = useState(35);
@@ -38,11 +37,13 @@ const Index = () => {
   const handleSave = (data: Omit<EmulationApp, "id">) => {
     setApps(prev => editing ? prev.map(app => app.id === editing.id ? { ...data, id: app.id } : app) : [...prev, { ...data, id: crypto.randomUUID() }]);
     setShowAddForm(false); setEditing(undefined);
-    toast.success(editing ? "Cartridge updated!" : "Cartridge added!");
+    toast.success(editing ? "App updated!" : "App added!");
   };
   const handleEdit = (app: EmulationApp) => { setEditing(app); setShowAddForm(true); };
   const handleDelete = (id: string) => setApps(prev => prev.filter(app => app.id !== id));
-  const handlePlay = (app: EmulationApp) => toast.info(`${app.name}: open this game in your emulator. This browser organizer cannot launch local emulator apps.`);
+  const handleOpen = (app: EmulationApp) => {
+    if (app.url) window.open(app.url, "_blank", "noopener,noreferrer");
+  };
   const handleToggleFavorite = (app: EmulationApp) => setApps(prev => prev.map(a => a.id === app.id ? { ...a, status: a.status === "favorite" ? "installed" : "favorite" } : a));
   const closeForm = () => { setShowAddForm(false); setEditing(undefined); };
   const mediaError = () => { toast.error("This media could not be displayed. Try PNG, JPG, GIF, MP4, or WebM."); setBackground(null); };
@@ -65,15 +66,15 @@ const Index = () => {
         </div>
       </header>
       <section className="console-hero relative z-10 mx-auto px-5 pb-10 pt-9 text-center sm:pb-12 sm:pt-12" style={background ? { backgroundImage: "none", backgroundColor: "transparent" } : undefined}>
-        <p className="retro-hud mb-5 text-[8px] leading-6 tracking-wide sm:text-[10px]">— GAME SELECT —</p>
+        <p className="retro-hud mb-5 text-[8px] leading-6 tracking-wide sm:text-[10px]">— APP SELECT —</p>
         <h1 aria-label="EmuHub" className="retro-title text-3xl sm:text-5xl md:text-6xl">
           {"EmuHub".split("").map((letter, i) => <span key={i} style={{ color: ["var(--retro-red)", "var(--retro-gold)", "#65c649", "#65c649", "var(--retro-red)", "var(--retro-gold)"][i], transform: `rotate(${i % 2 ? 2 : -2}deg)` }}>{letter}</span>)}
         </h1>
-        <p className="retro-hud mt-6 text-[10px] sm:text-xs">Choose your adventure.</p>
-        <Button onClick={() => { setEditing(undefined); setShowAddForm(true); }} className="retro-button mt-7 h-12 rounded-xl px-7"><Plus className="mr-2 h-5 w-5" /> Add Game</Button>
+        <p className="retro-hud mt-6 text-[10px] sm:text-xs">All your emulation apps. One hub.</p>
+        <Button onClick={() => { setEditing(undefined); setShowAddForm(true); }} className="retro-button mt-7 h-12 rounded-xl px-7"><Plus className="mr-2 h-5 w-5" /> Add App</Button>
       </section>
-      <main className="console-library relative z-10 mx-auto max-w-6xl p-4 sm:p-7"><EmulationAppList apps={apps} onEdit={handleEdit} onDelete={handleDelete} onPlay={handlePlay} onToggleFavorite={handleToggleFavorite} /></main>
-      <footer className="console-footer relative z-10 flex flex-wrap items-center justify-center gap-6 px-4 py-5 text-xs"><span className="flex items-center gap-2"><Gamepad2 className="h-6 w-6 text-slate-300" /> Your collection</span><span className="flex items-center gap-2"><span className="console-key bg-green-400 text-green-950">A</span> Pick your adventure</span><span className="flex items-center gap-2"><Star className="h-5 w-5 fill-yellow-400 text-yellow-400" /> {apps.length} games</span></footer>
+      <main className="console-library relative z-10 mx-auto max-w-6xl p-4 sm:p-7"><EmulationAppList apps={apps} onEdit={handleEdit} onDelete={handleDelete} onOpen={handleOpen} onToggleFavorite={handleToggleFavorite} /></main>
+      <footer className="console-footer relative z-10 flex flex-wrap items-center justify-center gap-6 px-4 py-5 text-xs"><span className="flex items-center gap-2"><Gamepad2 className="h-6 w-6 text-slate-300" /> Your app collection</span><span className="flex items-center gap-2"><Star className="h-5 w-5 fill-yellow-400 text-yellow-400" /> {apps.length} apps</span></footer>
       </div>
       {showAddForm && <AddEmulationApp app={editing} onAdd={handleSave} onClose={closeForm} upload={upload} />}
       {showSettings && <AppearanceSettings onClose={() => setShowSettings(false)} background={background} onBackground={setBackground} upload={upload} dim={dim} onDim={setDim} paused={paused} onPaused={setPaused} />}
