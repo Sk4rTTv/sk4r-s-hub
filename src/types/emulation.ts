@@ -6,6 +6,7 @@ export interface EmulationApp {
   color: string;
   artwork?: string;
   url?: string;
+  appFile?: File;
   status: "installed" | "not-installed" | "favorite";
 }
 

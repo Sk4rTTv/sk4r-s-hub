@@ -1,5 +1,6 @@
 import { EmulationAppList } from "@/components/EmulationAppList";
 import { AddEmulationApp } from "@/components/AddEmulationApp";
+import { CartridgeArtwork } from "@/components/CartridgeArtwork";
 import { AppearanceSettings, type BackgroundMedia } from "@/components/AppearanceSettings";
 import { EmulationApp } from "@/types/emulation";
 import { Plus, Star, Gamepad2, ImagePlus, Volume2, VolumeX, Pause, Play } from "lucide-react";
@@ -12,6 +13,7 @@ import "@/retro.css";
 const Index = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editing, setEditing] = useState<EmulationApp>();
+  const [artworkApp, setArtworkApp] = useState<EmulationApp>();
   const [apps, setApps] = useState<EmulationApp[]>([]);
   const [showSettings, setShowSettings] = useState(false);
   const [background, setBackground] = useState<BackgroundMedia | null>(null);
@@ -73,10 +75,15 @@ const Index = () => {
         <p className="retro-hud mt-6 text-[10px] sm:text-xs">All your emulation apps. One hub.</p>
         <Button onClick={() => { setEditing(undefined); setShowAddForm(true); }} className="retro-button mt-7 h-12 rounded-xl px-7"><Plus className="mr-2 h-5 w-5" /> Add App</Button>
       </section>
-      <main className="console-library relative z-10 mx-auto max-w-6xl p-4 sm:p-7"><EmulationAppList apps={apps} onEdit={handleEdit} onDelete={handleDelete} onOpen={handleOpen} onToggleFavorite={handleToggleFavorite} /></main>
+      <main className="console-library relative z-10 mx-auto max-w-6xl p-4 sm:p-7"><EmulationAppList apps={apps} onEdit={handleEdit} onArtwork={setArtworkApp} onDelete={handleDelete} onOpen={handleOpen} onToggleFavorite={handleToggleFavorite} /></main>
       <footer className="console-footer relative z-10 flex flex-wrap items-center justify-center gap-6 px-4 py-5 text-xs"><span className="flex items-center gap-2"><Gamepad2 className="h-6 w-6 text-slate-300" /> Your app collection</span><span className="flex items-center gap-2"><Star className="h-5 w-5 fill-yellow-400 text-yellow-400" /> {apps.length} apps</span></footer>
       </div>
-      {showAddForm && <AddEmulationApp app={editing} onAdd={handleSave} onClose={closeForm} upload={upload} />}
+      {showAddForm && <AddEmulationApp app={editing} onAdd={handleSave} onClose={closeForm} />}
+      {artworkApp && <CartridgeArtwork app={artworkApp} upload={upload} onClose={() => setArtworkApp(undefined)} onSave={artwork => {
+        setApps(prev => prev.map(app => app.id === artworkApp.id ? { ...app, artwork } : app));
+        setArtworkApp(undefined);
+        toast.success("Cartridge image updated!");
+      }} />}
       {showSettings && <AppearanceSettings onClose={() => setShowSettings(false)} background={background} onBackground={setBackground} upload={upload} dim={dim} onDim={setDim} paused={paused} onPaused={setPaused} />}
     </div>
   );
