@@ -1,19 +1,16 @@
 # Tech Stack
 
-- You are building a React application.
-- Use TypeScript.
-- Use React Router. KEEP the routes in src/App.tsx
-- Always put source code in the src folder.
-- Put pages into src/pages/
-- Put components into src/components/
-- The main page (default page) is src/pages/Index.tsx
-- UPDATE the main page to include the new components. OTHERWISE, the user can NOT see any components!
-- ALWAYS try to use the shadcn/ui library.
-- Tailwind CSS: always use Tailwind CSS for styling components. Utilize Tailwind classes extensively for layout, spacing, colors, and other design aspects.
+- React + TypeScript, React Router; keep routes in `src/App.tsx`.
+- Pages in `src/pages/`, components in `src/components/`; main page is `src/pages/Index.tsx`.
+- Use customized shadcn/ui components and Tailwind CSS. Do not edit the shared shadcn/ui files.
+- lucide-react and the shadcn/Radix dependencies are available.
 
-Available packages and libraries:
+# Windows Desktop
 
-- The lucide-react package is installed for icons.
-- You ALREADY have ALL the shadcn/ui components and their dependencies installed. So you don't need to install them again.
-- You have ALL the necessary Radix UI components installed.
-- Use prebuilt components from the shadcn/ui library after importing them. Note that these files shouldn't be edited, so make new components if you need to change them.
+- EmuHub also has an Electron desktop shell in `src/desktop/main.cjs` and `preload.cjs`.
+- Vite uses relative asset paths; desktop routing uses HashRouter, browser routing uses BrowserRouter.
+- Only expose narrow, typed `window.emuDesktop` methods. Keep nodeIntegration off, contextIsolation and sandbox on.
+- Validate IPC main-frame senders. Native launching is Windows-only: select `.exe` in the native picker, register it in the main process, launch only registered IDs with explicit user confirmation and `shell: false`. Never accept arbitrary renderer paths, arguments, commands, or IPC channels.
+- Executable registrations and app/media state last for the current session. No automatic native launch or silent screen capture.
+- Native emulators run in their own windows; projection is display-only window sharing, not embedded execution or remote input.
+- `desktop` and `desktop:package` npm scripts provide local startup and Windows NSIS packaging. The web preview/build does not test Windows runtime or produce the installer.
