@@ -7,6 +7,7 @@ export interface EmulationApp {
   artwork?: string;
   url?: string;
   appFile?: File;
+  directoryKey?: string;
   nativeExecutable?: import("./desktop").NativeExecutable;
   status: "installed" | "not-installed" | "favorite";
 }

@@ -4,9 +4,12 @@ const fs = require('node:fs/promises');
 const { pathToFileURL } = require('node:url');
 const { randomUUID } = require('node:crypto');
 const { spawn } = require('node:child_process');
+const { scanAppDirectory } = require('./directory-scan.cjs');
 
 let window;
 const executables = new Map();
+const directoryEntries = new Map();
+let scanningDirectory = false;
 const projectionSources = new Map();
 let selectedProjection = null;
 const indexFile = path.resolve(__dirname, '../../dist/index.html');
@@ -35,6 +38,28 @@ ipcMain.handle('emuhub:select-executable', async event => {
   const name = path.basename(filePath, path.extname(filePath));
   executables.set(id, { filePath, name });
   return { id, name, fileName: path.basename(filePath) };
+});
+
+ipcMain.handle('emuhub:select-app-directory', async event => {
+  authorize(event);
+  if (process.platform !== 'win32') throw new Error('Desktop directory scanning is configured for Windows.');
+  if (scanningDirectory) throw new Error('A directory scan is already in progress.');
+  scanningDirectory = true;
+  try {
+    const result = await dialog.showOpenDialog(window, { title: 'Choose a folder of installed apps', properties: ['openDirectory'] });
+    if (result.canceled || !result.filePaths[0]) return null;
+    authorize(event);
+    const root = await fs.realpath(result.filePaths[0]);
+    if (!(await fs.stat(root)).isDirectory()) throw new Error('Choose an app directory.');
+    const scan = await scanAppDirectory(root);
+    authorize(event);
+    const entries = scan.files.map(file => {
+      const key = file.filePath.toLowerCase();
+      if (!directoryEntries.has(key)) directoryEntries.set(key, randomUUID());
+      return { id: directoryEntries.get(key), fileName: file.fileName, relativePath: file.relativePath };
+    });
+    return { folderName: path.basename(root) || 'Selected drive', entries, truncated: scan.truncated, skippedDirectories: scan.skippedDirectories };
+  } finally { scanningDirectory = false; }
 });
 
 ipcMain.handle('emuhub:launch-executable', async (event, id) => {

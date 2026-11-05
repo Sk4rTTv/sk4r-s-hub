@@ -1,10 +1,11 @@
 import { EmulationAppList } from "@/components/EmulationAppList";
 import { AddEmulationApp } from "@/components/AddEmulationApp";
+import { DirectoryImport } from "@/components/DirectoryImport";
 import { CartridgeArtwork } from "@/components/CartridgeArtwork";
 import { StartMenu } from "@/components/StartMenu";
 import { AppearanceSettings, type BackgroundMedia } from "@/components/AppearanceSettings";
 import { EmulationApp } from "@/types/emulation";
-import { Plus, Star, Gamepad2, ImagePlus, Volume2, VolumeX, Pause, Play, Monitor, Settings, ArrowLeft } from "lucide-react";
+import { Plus, Star, Gamepad2, ImagePlus, Volume2, VolumeX, Pause, Play, Monitor, Settings, ArrowLeft, FolderOpen } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,7 @@ const Index = () => {
   const [started, setStarted] = useState(false);
   const collectionTitle = useRef<HTMLHeadingElement>(null);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showDirectoryImport, setShowDirectoryImport] = useState(false);
   const [editing, setEditing] = useState<EmulationApp>();
   const [artworkApp, setArtworkApp] = useState<EmulationApp>();
   const [apps, setApps] = useState<EmulationApp[]>([]);
@@ -71,6 +73,15 @@ const Index = () => {
     setApps(prev => editing ? prev.map(app => app.id === editing.id ? { ...data, id: app.id } : app) : [...prev, { ...data, id: crypto.randomUUID() }]);
     setShowAddForm(false); setEditing(undefined);
     toast.success(editing ? "App updated!" : "App added!");
+  };
+  const handleDirectoryImport = (entries: Omit<EmulationApp, "id">[]) => {
+    const imported = entries.map(entry => ({ ...entry, id: crypto.randomUUID() }));
+    setApps(current => {
+      const keys = new Set(current.map(app => app.directoryKey).filter(Boolean));
+      return [...current, ...imported.filter(app => !app.directoryKey || !keys.has(app.directoryKey))];
+    });
+    setShowDirectoryImport(false);
+    toast.success(`${imported.length} ${imported.length === 1 ? "app" : "apps"} added from directory.`);
   };
   const handleEdit = (app: EmulationApp) => { setEditing(app); setShowAddForm(true); };
   const handleDelete = (id: string) => setApps(prev => prev.filter(app => app.id !== id));
@@ -133,6 +144,7 @@ const Index = () => {
         <p className="retro-hud mt-6 text-[length:calc(.625rem*var(--text-scale))] sm:text-xs">All your emulation apps One hub.</p>
         {started ? <div className="mt-7 flex flex-wrap justify-center gap-4">
           <Button onClick={() => { setEditing(undefined); setShowAddForm(true); }} className="retro-button h-12 rounded-xl px-7"><Plus className="mr-2 h-5 w-5" /> Add App</Button>
+          <Button onClick={() => setShowDirectoryImport(true)} className="retro-button h-12 rounded-xl px-7"><FolderOpen className="mr-2 h-5 w-5" />Directory Folder</Button>
           <Button asChild className="retro-button h-12 rounded-xl px-7"><Link to="/hub"><Monitor className="mr-2 h-5 w-5" />App Projection Hub</Link></Button>
         </div> : !inHub && <StartMenu onStart={() => setStarted(true)} />}
       </section>
@@ -143,6 +155,7 @@ const Index = () => {
       <footer className="console-footer relative z-10 flex flex-wrap items-center justify-center gap-6 px-4 py-5 text-xs"><span className="flex items-center gap-2"><Gamepad2 className="h-6 w-6 text-slate-300" /> {started ? "Your app collection" : "Choose your next adventure"}</span><span className="flex items-center gap-2"><Star className="h-5 w-5 fill-yellow-400 text-yellow-400" /> {apps.length} apps</span></footer>
       </div>
       {showAddForm && <AddEmulationApp app={editing} onAdd={handleSave} onClose={closeForm} />}
+      {showDirectoryImport && <DirectoryImport apps={apps} onClose={() => setShowDirectoryImport(false)} onImport={handleDirectoryImport} />}
       {artworkApp && <CartridgeArtwork app={artworkApp} upload={upload} onClose={() => setArtworkApp(undefined)} onSave={artwork => {
         setApps(prev => prev.map(app => app.id === artworkApp.id ? { ...app, artwork } : app));
         setArtworkApp(undefined);

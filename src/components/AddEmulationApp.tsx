@@ -49,7 +49,7 @@ export const AddEmulationApp = ({ app, onAdd, onClose }: AddEmulationAppProps) =
         link = parsed.href;
       } catch { setError("Enter a full http:// or https:// app link."); return; }
     }
-    onAdd({ name: name.trim(), system: system.trim(), icon: icon || "🎮", color, artwork: app?.artwork, appFile, nativeExecutable, status, url: link });
+    onAdd({ name: name.trim(), system: system.trim(), icon: icon || "🎮", color, artwork: app?.artwork, appFile, directoryKey: app?.directoryKey, nativeExecutable, status, url: link });
   };
 
   return <Dialog open onOpenChange={open => { if (!open) onClose(); }}>
