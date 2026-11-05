@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { useRetroSounds } from "@/hooks/useRetroSounds";
 import { retroScenes } from "@/lib/retro-scenes";
 import { useRetroMotion } from "@/hooks/useRetroMotion";
+import startMenuWallpaper from "@/assets/start-menu-wallpaper.svg";
 import { toast } from "sonner";
 import "@/retro.css";
 
@@ -64,7 +65,7 @@ const Index = () => {
     if (!player) return;
     if (paused || inHub) player.pause();
     else void player.play().catch(() => { setPaused(true); });
-  }, [paused, background, inHub]);
+  }, [paused, background, inHub, started]);
 
   const handleSave = (data: Omit<EmulationApp, "id">) => {
     setApps(prev => editing ? prev.map(app => app.id === editing.id ? { ...data, id: app.id } : app) : [...prev, { ...data, id: crypto.randomUUID() }]);
@@ -97,13 +98,14 @@ const Index = () => {
   const handleToggleFavorite = (app: EmulationApp) => setApps(prev => prev.map(a => a.id === app.id ? { ...a, status: a.status === "favorite" ? "installed" : "favorite" } : a));
   const closeForm = () => { setShowAddForm(false); setEditing(undefined); };
   const mediaError = () => { toast.error("This media could not be displayed. Try PNG, JPG, GIF, MP4, or WebM."); setBackground(null); };
+  const selectedMedia = background?.type === "video" ? <video key={background.url} ref={video} src={background.url} muted loop playsInline autoPlay className="h-full w-full object-cover" onError={mediaError} /> : <img key={background?.url ?? scene.url} src={background?.url ?? scene.url} alt="" className="scene-image h-full w-full object-cover" onError={background ? mediaError : undefined} />;
 
   return (
     <>
     <div ref={world} hidden={inHub} className="retro-world relative min-h-screen overflow-x-hidden px-2 py-3 text-white sm:p-6">
       <div className="retro-backdrop pointer-events-none fixed" aria-hidden="true">
-        {background?.type === "video" ? <video key={background.url} ref={video} src={background.url} muted loop playsInline autoPlay className="h-full w-full object-cover" onError={mediaError} /> : <img key={background?.url ?? scene.url} src={background?.url ?? scene.url} alt="" className="scene-image h-full w-full object-cover" onError={background ? mediaError : undefined} />}
-        <div className="absolute inset-0 bg-blue-950" style={{ opacity: dim / 100 }} />
+        {started ? selectedMedia : <img src={startMenuWallpaper} alt="" className="h-full w-full object-cover" />}
+        <div className="absolute inset-0 bg-blue-950" style={{ opacity: started ? dim / 100 : 0.12 }} />
       </div>
       <div className="console-shell relative mx-auto max-w-6xl overflow-hidden rounded-3xl">
       <div aria-hidden="true" className="crt-lines pointer-events-none absolute inset-0 z-40" />
@@ -119,6 +121,10 @@ const Index = () => {
         </div>
       </header>
       <section className={`console-hero relative z-10 mx-auto px-5 pb-10 pt-9 text-center sm:pb-12 sm:pt-12 ${started ? "" : "title-screen"}`} style={{ backgroundImage: background ? "none" : `url("${scene.url}")`, backgroundColor: "transparent" }}>
+        {!started && background && <div aria-hidden="true" className="hero-shade pointer-events-none absolute inset-0">
+          {selectedMedia}
+          <div className="absolute inset-0 bg-blue-950" style={{ opacity: dim / 100 }} />
+        </div>}
         {!background && <div aria-hidden="true" className="hero-shade pointer-events-none absolute inset-0 bg-blue-950" style={{ opacity: dim / 100 }} />}
         <p className="retro-hud mb-5 text-[length:calc(.5rem*var(--text-scale))] leading-6 tracking-wide sm:text-[length:calc(.625rem*var(--text-scale))]">{started ? "— APP SELECT —" : "— PLAYER ONE · READY —"}</p>
         <h1 aria-label="EmuHub" className="retro-title text-3xl sm:text-5xl md:text-6xl">
