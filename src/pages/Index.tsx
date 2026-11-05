@@ -3,8 +3,9 @@ import { AddEmulationApp } from "@/components/AddEmulationApp";
 import { CartridgeArtwork } from "@/components/CartridgeArtwork";
 import { AppearanceSettings, type BackgroundMedia } from "@/components/AppearanceSettings";
 import { EmulationApp } from "@/types/emulation";
-import { Plus, Star, Gamepad2, ImagePlus, Volume2, VolumeX, Pause, Play } from "lucide-react";
+import { Plus, Star, Gamepad2, ImagePlus, Volume2, VolumeX, Pause, Play, Monitor } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useRetroSounds } from "@/hooks/useRetroSounds";
 import { toast } from "sonner";
@@ -22,6 +23,7 @@ const Index = () => {
   const video = useRef<HTMLVideoElement>(null);
   const urls = useRef<string[]>([]);
   const { enabled, setEnabled } = useRetroSounds();
+  const inHub = useLocation().pathname.replace(/\/$/, "") === "/hub";
 
   const upload = (file: File) => {
     const url = URL.createObjectURL(file);
@@ -32,9 +34,9 @@ const Index = () => {
   useEffect(() => {
     const player = video.current;
     if (!player) return;
-    if (paused) player.pause();
+    if (paused || inHub) player.pause();
     else void player.play().catch(() => { setPaused(true); });
-  }, [paused, background]);
+  }, [paused, background, inHub]);
 
   const handleSave = (data: Omit<EmulationApp, "id">) => {
     setApps(prev => editing ? prev.map(app => app.id === editing.id ? { ...data, id: app.id } : app) : [...prev, { ...data, id: crypto.randomUUID() }]);
@@ -51,7 +53,8 @@ const Index = () => {
   const mediaError = () => { toast.error("This media could not be displayed. Try PNG, JPG, GIF, MP4, or WebM."); setBackground(null); };
 
   return (
-    <div className="retro-world relative min-h-screen overflow-x-hidden px-2 py-3 text-white sm:p-6">
+    <>
+    <div hidden={inHub} className="retro-world relative min-h-screen overflow-x-hidden px-2 py-3 text-white sm:p-6">
       {background && <div className="pointer-events-none fixed inset-0">
         {background.type === "video" ? <video key={background.url} ref={video} src={background.url} muted loop playsInline autoPlay className="h-full w-full object-cover" onError={mediaError} /> : <img src={background.url} alt="" className="h-full w-full object-cover" onError={mediaError} />}
         <div className="absolute inset-0 bg-blue-950" style={{ opacity: dim / 100 }} />
@@ -73,7 +76,10 @@ const Index = () => {
           {"EmuHub".split("").map((letter, i) => <span key={i} style={{ color: ["var(--retro-red)", "var(--retro-gold)", "#65c649", "#65c649", "var(--retro-red)", "var(--retro-gold)"][i], transform: `rotate(${i % 2 ? 2 : -2}deg)` }}>{letter}</span>)}
         </h1>
         <p className="retro-hud mt-6 text-[10px] sm:text-xs">All your emulation apps One hub.</p>
-        <Button onClick={() => { setEditing(undefined); setShowAddForm(true); }} className="retro-button mt-7 h-12 rounded-xl px-7"><Plus className="mr-2 h-5 w-5" /> Add App</Button>
+        <div className="mt-7 flex flex-wrap justify-center gap-4">
+          <Button onClick={() => { setEditing(undefined); setShowAddForm(true); }} className="retro-button h-12 rounded-xl px-7"><Plus className="mr-2 h-5 w-5" /> Add App</Button>
+          <Button asChild className="retro-button h-12 rounded-xl px-7"><Link to="/hub"><Monitor className="mr-2 h-5 w-5" />App Projection Hub</Link></Button>
+        </div>
       </section>
       <main className="console-library relative z-10 mx-auto max-w-6xl p-4 sm:p-7"><EmulationAppList apps={apps} onEdit={handleEdit} onArtwork={setArtworkApp} onDelete={handleDelete} onOpen={handleOpen} onToggleFavorite={handleToggleFavorite} /></main>
       <footer className="console-footer relative z-10 flex flex-wrap items-center justify-center gap-6 px-4 py-5 text-xs"><span className="flex items-center gap-2"><Gamepad2 className="h-6 w-6 text-slate-300" /> Your app collection</span><span className="flex items-center gap-2"><Star className="h-5 w-5 fill-yellow-400 text-yellow-400" /> {apps.length} apps</span></footer>
@@ -86,6 +92,8 @@ const Index = () => {
       }} />}
       {showSettings && <AppearanceSettings onClose={() => setShowSettings(false)} background={background} onBackground={setBackground} upload={upload} dim={dim} onDim={setDim} paused={paused} onPaused={setPaused} />}
     </div>
+    <Outlet context={{ apps }} />
+    </>
   );
 };
 export default Index;
