@@ -1,11 +1,16 @@
 import { EmulationAppList } from "@/components/EmulationAppList";
 import { AddEmulationApp } from "@/components/AddEmulationApp";
 import { DirectoryImport } from "@/components/DirectoryImport";
+import { GamesLibrary } from "@/components/GamesLibrary";
+import { GameEditor } from "@/components/GameEditor";
 import { CartridgeArtwork } from "@/components/CartridgeArtwork";
 import { StartMenu } from "@/components/StartMenu";
 import { AppearanceSettings, type BackgroundMedia } from "@/components/AppearanceSettings";
 import { EmulationApp } from "@/types/emulation";
-import { Plus, Star, Gamepad2, ImagePlus, Volume2, VolumeX, Pause, Play, Monitor, Settings, ArrowLeft, FolderOpen } from "lucide-react";
+import type { LibraryGame } from "@/types/game";
+import { directoryFileKey, type DirectorySelection } from "@/lib/directory-import";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Plus, Star, Gamepad2, ImagePlus, Volume2, VolumeX, Pause, Play, Monitor, Settings, ArrowLeft, FolderOpen, AppWindow } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -21,6 +26,10 @@ const Index = () => {
   const collectionTitle = useRef<HTMLHeadingElement>(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [showDirectoryImport, setShowDirectoryImport] = useState(false);
+  const [showGameImport, setShowGameImport] = useState(false);
+  const [libraryTab, setLibraryTab] = useState("apps");
+  const [editingGame, setEditingGame] = useState<LibraryGame>();
+  const [games, setGames] = useState<LibraryGame[]>([]);
   const [editing, setEditing] = useState<EmulationApp>();
   const [artworkApp, setArtworkApp] = useState<EmulationApp>();
   const [apps, setApps] = useState<EmulationApp[]>([]);
@@ -36,7 +45,7 @@ const Index = () => {
   const inHub = ["/hub", "/settings"].includes(useLocation().pathname.replace(/\/$/, ""));
   const [sceneId, setSceneId] = useState(retroScenes[0].id);
   const [shuffle, setShuffle] = useState(false);
-  const world = useRetroMotion(!inHub && started, apps.length);
+  const world = useRetroMotion(!inHub && started, apps.length + games.length, libraryTab);
   useEffect(() => {
     if (inHub) setStarted(false);
     else if (started) collectionTitle.current?.focus({ preventScroll: true });
@@ -74,14 +83,23 @@ const Index = () => {
     setShowAddForm(false); setEditing(undefined);
     toast.success(editing ? "App updated!" : "App added!");
   };
-  const handleDirectoryImport = (entries: Omit<EmulationApp, "id">[]) => {
-    const imported = entries.map(entry => ({ ...entry, id: crypto.randomUUID() }));
+  const handleDirectoryImport = (entries: DirectorySelection[]) => {
+    const imported: EmulationApp[] = entries.map(entry => ({ id: crypto.randomUUID(), name: entry.name, system: entry.system, icon: "🎮", color: "#64748b", status: "installed", appFile: entry.file, directoryKey: entry.key }));
     setApps(current => {
       const keys = new Set(current.map(app => app.directoryKey).filter(Boolean));
-      return [...current, ...imported.filter(app => !app.directoryKey || !keys.has(app.directoryKey))];
+      return [...current, ...imported.filter(app => !keys.has(app.directoryKey))];
     });
     setShowDirectoryImport(false);
     toast.success(`${imported.length} ${imported.length === 1 ? "app" : "apps"} added from directory.`);
+  };
+  const handleGameImport = (entries: DirectorySelection[]) => {
+    const imported: LibraryGame[] = entries.map(entry => ({ id: crypto.randomUUID(), name: entry.name, system: entry.system, icon: "🎮", color: "#64748b", fileName: entry.fileName, relativePath: entry.relativePath, file: entry.file, directoryKey: entry.key }));
+    setGames(current => {
+      const keys = new Set(current.map(game => game.directoryKey));
+      return [...current, ...imported.filter(game => !keys.has(game.directoryKey))];
+    });
+    setShowGameImport(false);
+    toast.success(`${imported.length} ${imported.length === 1 ? "game" : "games"} added to console shelves.`);
   };
   const handleEdit = (app: EmulationApp) => { setEditing(app); setShowAddForm(true); };
   const handleDelete = (id: string) => setApps(prev => prev.filter(app => app.id !== id));
@@ -124,7 +142,7 @@ const Index = () => {
         <div className="flex items-center gap-3"><Gamepad2 className="h-8 w-8 text-[var(--retro-gold)]" /><span className="retro-hud text-xs">EmuHub</span></div>
         <div className="flex flex-wrap items-center gap-3">
           {started && <Button variant="outline" onClick={() => { setStarted(false); window.scrollTo({ top: 0, behavior: "instant" }); }} className="h-10 rounded-xl border-2 border-blue-200 bg-blue-900 text-white"><ArrowLeft className="mr-2 h-4 w-4" />Start menu</Button>}
-          <div className="retro-hud mr-2 flex items-center gap-2 text-xs"><Star className="h-6 w-6 fill-[var(--retro-gold)] text-[var(--retro-gold)]" /><span>× {String(apps.length).padStart(2, "0")}</span></div>
+          <div className="retro-hud mr-2 flex items-center gap-2 text-xs" aria-label={`${apps.length} apps and ${games.length} games`}><Star className="h-6 w-6 fill-[var(--retro-gold)] text-[var(--retro-gold)]" /><span>× {String(apps.length + games.length).padStart(2, "0")}</span></div>
           <Button variant="outline" onClick={() => setEnabled(!enabled)} aria-pressed={enabled} aria-label={enabled ? "Mute retro sounds" : "Enable retro sounds"} className="h-10 rounded-xl border-2 border-blue-200 bg-blue-900 text-white hover:bg-blue-800 hover:text-white">{enabled ? <Volume2 className="mr-2 h-4 w-4" /> : <VolumeX className="mr-2 h-4 w-4" />}Sound {enabled ? "on" : "off"}</Button>
           <Button variant="outline" onClick={() => setShowSettings(true)} className="h-10 rounded-xl border-2 border-blue-200 bg-blue-900 text-white hover:bg-blue-800 hover:text-white"><ImagePlus className="mr-2 h-4 w-4" />Background</Button>
           <Button asChild variant="outline" className="h-10 rounded-xl border-2 border-blue-200 bg-blue-900 text-white hover:bg-blue-800 hover:text-white"><Link to="/settings"><Settings className="mr-2 h-4 w-4" />Settings</Link></Button>
@@ -137,25 +155,40 @@ const Index = () => {
           <div className="absolute inset-0 bg-blue-950" style={{ opacity: dim / 100 }} />
         </div>}
         {!background && <div aria-hidden="true" className="hero-shade pointer-events-none absolute inset-0 bg-blue-950" style={{ opacity: dim / 100 }} />}
-        <p className="retro-hud mb-5 text-[length:calc(.5rem*var(--text-scale))] leading-6 tracking-wide sm:text-[length:calc(.625rem*var(--text-scale))]">{started ? "— APP SELECT —" : "— PLAYER ONE · READY —"}</p>
+        <p className="retro-hud mb-5 text-[length:calc(.5rem*var(--text-scale))] leading-6 tracking-wide sm:text-[length:calc(.625rem*var(--text-scale))]">{started ? libraryTab === "games" ? "— GAME SELECT —" : "— APP SELECT —" : "— PLAYER ONE · READY —"}</p>
         <h1 aria-label="EmuHub" className="retro-title text-3xl sm:text-5xl md:text-6xl">
           {"EmuHub".split("").map((letter, i) => <span key={i} style={{ color: ["var(--retro-red)", "var(--retro-gold)", "#65c649", "#65c649", "var(--retro-red)", "var(--retro-gold)"][i], transform: `rotate(${i % 2 ? 2 : -2}deg)` }}>{letter}</span>)}
         </h1>
-        <p className="retro-hud mt-6 text-[length:calc(.625rem*var(--text-scale))] sm:text-xs">All your emulation apps One hub.</p>
+        <p className="retro-hud mt-6 text-[length:calc(.625rem*var(--text-scale))] sm:text-xs">Your emulation apps and games. One hub.</p>
         {started ? <div className="mt-7 flex flex-wrap justify-center gap-4">
-          <Button onClick={() => { setEditing(undefined); setShowAddForm(true); }} className="retro-button h-12 rounded-xl px-7"><Plus className="mr-2 h-5 w-5" /> Add App</Button>
-          <Button onClick={() => setShowDirectoryImport(true)} className="retro-button h-12 rounded-xl px-7"><FolderOpen className="mr-2 h-5 w-5" />Directory Folder</Button>
+          {libraryTab === "apps" ? <>
+            <Button onClick={() => { setEditing(undefined); setShowAddForm(true); }} className="retro-button h-12 rounded-xl px-7"><Plus className="mr-2 h-5 w-5" /> Add App</Button>
+            <Button onClick={() => setShowDirectoryImport(true)} className="retro-button h-12 rounded-xl px-7"><FolderOpen className="mr-2 h-5 w-5" />Directory Folder</Button>
+          </> : <Button onClick={() => setShowGameImport(true)} className="retro-button h-12 rounded-xl px-7"><FolderOpen className="mr-2 h-5 w-5" />Add Games Directory</Button>}
           <Button asChild className="retro-button h-12 rounded-xl px-7"><Link to="/hub"><Monitor className="mr-2 h-5 w-5" />App Projection Hub</Link></Button>
         </div> : !inHub && <StartMenu onStart={() => setStarted(true)} />}
       </section>
       {started && <main className="console-library relative z-10 mx-auto max-w-6xl p-4 sm:p-7">
-        <h2 ref={collectionTitle} tabIndex={-1} className="retro-hud mb-5 text-xs text-yellow-300">Your app collection</h2>
-        <EmulationAppList apps={apps} onEdit={handleEdit} onArtwork={setArtworkApp} onDelete={handleDelete} onOpen={handleOpen} onLaunch={handleLaunch} launchingAppId={launchingAppId} onToggleFavorite={handleToggleFavorite} />
+        <h2 ref={collectionTitle} tabIndex={-1} className="retro-hud mb-5 text-xs text-yellow-300">Your library</h2>
+        <Tabs value={libraryTab} onValueChange={setLibraryTab}>
+          <TabsList aria-label="Library collection" className="library-tabs mb-6 h-auto w-full flex-wrap justify-start gap-2 rounded-2xl border-2 border-indigo-400 bg-indigo-950 p-2 sm:w-auto">
+            <TabsTrigger value="apps" className="flex-1 flex-wrap gap-2 rounded-xl border-2 border-transparent px-3 py-3 text-xs text-blue-100 data-[state=active]:border-yellow-300 data-[state=active]:bg-yellow-300 data-[state=active]:text-blue-950 sm:px-5 sm:text-sm"><AppWindow className="h-5 w-5" />Apps <span className="font-mono">({apps.length})</span></TabsTrigger>
+            <TabsTrigger value="games" className="flex-1 flex-wrap gap-2 rounded-xl border-2 border-transparent px-3 py-3 text-xs text-blue-100 data-[state=active]:border-yellow-300 data-[state=active]:bg-yellow-300 data-[state=active]:text-blue-950 sm:px-5 sm:text-sm"><Gamepad2 className="h-5 w-5" />Games <span className="font-mono">({games.length})</span></TabsTrigger>
+          </TabsList>
+          <TabsContent value="apps" className="mt-0"><EmulationAppList apps={apps} onEdit={handleEdit} onArtwork={setArtworkApp} onDelete={handleDelete} onOpen={handleOpen} onLaunch={handleLaunch} launchingAppId={launchingAppId} onToggleFavorite={handleToggleFavorite} /></TabsContent>
+          <TabsContent value="games" className="mt-0"><GamesLibrary games={games} onImport={() => setShowGameImport(true)} onEdit={setEditingGame} onRemove={id => setGames(current => current.filter(game => game.id !== id))} /></TabsContent>
+        </Tabs>
       </main>}
-      <footer className="console-footer relative z-10 flex flex-wrap items-center justify-center gap-6 px-4 py-5 text-xs"><span className="flex items-center gap-2"><Gamepad2 className="h-6 w-6 text-slate-300" /> {started ? "Your app collection" : "Choose your next adventure"}</span><span className="flex items-center gap-2"><Star className="h-5 w-5 fill-yellow-400 text-yellow-400" /> {apps.length} apps</span></footer>
+      <footer className="console-footer relative z-10 flex flex-wrap items-center justify-center gap-6 px-4 py-5 text-xs"><span className="flex items-center gap-2"><Gamepad2 className="h-6 w-6 text-slate-300" /> {started ? "Your apps & games" : "Choose your next adventure"}</span><span className="flex items-center gap-2"><Star className="h-5 w-5 fill-yellow-400 text-yellow-400" /> {apps.length} apps · {games.length} games</span></footer>
       </div>
       {showAddForm && <AddEmulationApp app={editing} onAdd={handleSave} onClose={closeForm} />}
-      {showDirectoryImport && <DirectoryImport apps={apps} onClose={() => setShowDirectoryImport(false)} onImport={handleDirectoryImport} />}
+      {showDirectoryImport && <DirectoryImport kind="apps" existingKeys={apps.flatMap(app => [app.directoryKey, app.appFile ? directoryFileKey(app.appFile) : undefined].filter((key): key is string => !!key))} onClose={() => setShowDirectoryImport(false)} onImport={handleDirectoryImport} />}
+      {showGameImport && <DirectoryImport kind="games" existingKeys={games.map(game => game.directoryKey)} onClose={() => setShowGameImport(false)} onImport={handleGameImport} />}
+      {editingGame && <GameEditor game={editingGame} upload={upload} onClose={() => setEditingGame(undefined)} onSave={game => {
+        setGames(current => current.map(entry => entry.id === game.id ? game : entry));
+        setEditingGame(undefined);
+        toast.success("Game updated!");
+      }} />}
       {artworkApp && <CartridgeArtwork app={artworkApp} upload={upload} onClose={() => setArtworkApp(undefined)} onSave={artwork => {
         setApps(prev => prev.map(app => app.id === artworkApp.id ? { ...app, artwork } : app));
         setArtworkApp(undefined);

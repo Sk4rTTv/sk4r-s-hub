@@ -40,18 +40,18 @@ ipcMain.handle('emuhub:select-executable', async event => {
   return { id, name, fileName: path.basename(filePath) };
 });
 
-ipcMain.handle('emuhub:select-app-directory', async event => {
+async function selectDirectory(event, kind) {
   authorize(event);
   if (process.platform !== 'win32') throw new Error('Desktop directory scanning is configured for Windows.');
   if (scanningDirectory) throw new Error('A directory scan is already in progress.');
   scanningDirectory = true;
   try {
-    const result = await dialog.showOpenDialog(window, { title: 'Choose a folder of installed apps', properties: ['openDirectory'] });
+    const result = await dialog.showOpenDialog(window, { title: kind === 'games' ? 'Choose a folder of game files' : 'Choose a folder of installed apps', properties: ['openDirectory'] });
     if (result.canceled || !result.filePaths[0]) return null;
     authorize(event);
     const root = await fs.realpath(result.filePaths[0]);
-    if (!(await fs.stat(root)).isDirectory()) throw new Error('Choose an app directory.');
-    const scan = await scanAppDirectory(root);
+    if (!(await fs.stat(root)).isDirectory()) throw new Error('Choose a directory.');
+    const scan = await scanAppDirectory(root, kind);
     authorize(event);
     const entries = scan.files.map(file => {
       const key = file.filePath.toLowerCase();
@@ -60,7 +60,10 @@ ipcMain.handle('emuhub:select-app-directory', async event => {
     });
     return { folderName: path.basename(root) || 'Selected drive', entries, truncated: scan.truncated, skippedDirectories: scan.skippedDirectories };
   } finally { scanningDirectory = false; }
-});
+}
+
+ipcMain.handle('emuhub:select-app-directory', event => selectDirectory(event, 'apps'));
+ipcMain.handle('emuhub:select-game-directory', event => selectDirectory(event, 'games'));
 
 ipcMain.handle('emuhub:launch-executable', async (event, id) => {
   authorize(event);

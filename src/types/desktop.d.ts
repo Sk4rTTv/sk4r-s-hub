@@ -22,6 +22,7 @@ declare global {
     emuDesktop?: {
       selectExecutable: () => Promise<NativeExecutable | null>;
       selectAppDirectory: () => Promise<AppDirectoryScan | null>;
+      selectGameDirectory: () => Promise<AppDirectoryScan | null>;
       launchExecutable: (id: string) => Promise<{ launched: boolean }>;
       listProjectionSources: () => Promise<ProjectionSource[]>;
       selectProjectionSource: (id: string) => Promise<void>;

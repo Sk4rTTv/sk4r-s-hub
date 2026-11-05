@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-export function useRetroMotion(active: boolean, itemCount: number) {
+export function useRetroMotion(active: boolean, itemCount: number, view: string) {
   const root = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -43,7 +43,7 @@ export function useRetroMotion(active: boolean, itemCount: number) {
     configure();
     preference.addEventListener("change", configure);
     return () => { cleanup(); preference.removeEventListener("change", configure); };
-  }, [active, itemCount]);
+  }, [active, itemCount, view]);
 
   return root;
 }

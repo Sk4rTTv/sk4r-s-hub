@@ -3,7 +3,7 @@ import { cartridgeShapes, getCartridgeShape } from "@/lib/cartridge-shapes";
 import type { EmulationApp } from "@/types/emulation";
 import "@/cartridge-shapes.css";
 
-export function CartridgeDisplay({ app }: { app: EmulationApp }) {
+export function CartridgeDisplay({ app }: { app: Pick<EmulationApp, "name" | "system" | "color" | "icon" | "artwork"> }) {
   const shape = getCartridgeShape(app.system);
   const geometry = cartridgeShapes[shape];
   const [x, y, width, height] = geometry.label;

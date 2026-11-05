@@ -1,7 +1,8 @@
 const fs = require('node:fs/promises');
 const path = require('node:path');
+const gameFormats = require('../types/game-formats.json');
 
-async function scanAppDirectory(root) {
+async function scanAppDirectory(root, kind = 'apps') {
   const queue = [{ folder: root, depth: 0 }];
   const files = [];
   let inspected = 0;
@@ -21,10 +22,12 @@ async function scanAppDirectory(root) {
           continue;
         }
         const filePath = path.join(resolved, entry.name);
+        const extension = path.extname(entry.name).toLowerCase();
+        const supported = kind === 'games' ? Object.hasOwn(gameFormats, extension) : extension === '.exe';
         if (entry.isDirectory()) {
           if (depth < 12) queue.push({ folder: filePath, depth: depth + 1 });
           else truncated = true;
-        } else if (entry.isFile() && path.extname(entry.name).toLowerCase() === '.exe') {
+        } else if (entry.isFile() && supported) {
           files.push({ filePath, fileName: entry.name, relativePath: path.relative(root, filePath) });
         }
         if (inspected >= 20000 || files.length >= 500) { truncated = true; break; }

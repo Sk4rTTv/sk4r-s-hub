@@ -18,7 +18,7 @@
     "appId": "com.emuhub.desktop",
     "productName": "EmuHub",
     "directories": { "output": "desktop-release" },
-    "files": ["dist/**/*", "src/desktop/*.cjs", "package.json"],
+    "files": ["dist/**/*", "src/desktop/*.cjs", "src/types/game-formats.json", "package.json"],
     "asar": true,
     "win": { "target": ["nsis"] },
     "nsis": { "oneClick": false, "allowToChangeInstallationDirectory": true, "createDesktopShortcut": true }
