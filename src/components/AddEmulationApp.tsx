@@ -65,15 +65,15 @@ export const AddEmulationApp = ({ onAdd, onClose }: AddEmulationAppProps) => {
         }}
       >
         <div
-          className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+          className="absolute inset-0 bg-blue-950/70 backdrop-blur-sm"
           onClick={onClose}
         />
-        <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-white/20 overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300">
-          <div className="bg-gradient-to-r from-red-500 via-blue-500 to-purple-600 p-6">
+        <div className="retro-dialog relative max-h-[90dvh] w-full max-w-md overflow-y-auto rounded-3xl motion-safe:animate-in motion-safe:fade-in duration-200">
+          <div className="border-b-4 border-amber-900 bg-blue-800 p-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-white text-xl font-bold flex items-center gap-2">
+              <h2 className="text-white text-xl font-black flex items-center gap-2">
                 <Gamepad2 className="h-5 w-5" />
-                Add Emulation App
+                New Adventure
               </h2>
               <button
                 onClick={onClose}
@@ -160,10 +160,10 @@ export const AddEmulationApp = ({ onAdd, onClose }: AddEmulationAppProps) => {
                     key={s}
                     type="button"
                     onClick={() => setStatus(s as EmulationApp["status"])}
-                    className={`flex-1 py-2 rounded-xl text-sm font-medium transition-all ${
+                    className={`flex-1 py-2 rounded-xl text-sm font-bold transition-colors ${
                       status === s
-                        ? "bg-gradient-to-r from-red-500 to-blue-500 text-white shadow-md"
-                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                        ? "border-2 border-amber-700 bg-amber-300 text-amber-950"
+                        : "border-2 border-amber-200 bg-amber-50 text-amber-900 hover:bg-amber-100"
                     }`}
                   >
                     {s.charAt(0).toUpperCase() + s.slice(1).replace("-", " ")}
@@ -206,7 +206,7 @@ export const AddEmulationApp = ({ onAdd, onClose }: AddEmulationAppProps) => {
               </Button>
               <Button
                 type="submit"
-                className="bg-gradient-to-r from-red-500 to-blue-600 hover:from-red-600 hover:to-blue-700 text-white rounded-xl shadow-lg"
+                className="retro-button rounded-xl"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 Add Game

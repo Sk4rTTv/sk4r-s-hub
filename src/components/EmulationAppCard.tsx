@@ -1,13 +1,7 @@
 import { EmulationApp } from "../types/emulation";
-import { Play, Star, Download, MoreHorizontal } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Star, MoreHorizontal, Play, Pencil, Trash2 } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
 
 interface EmulationAppCardProps {
   app: EmulationApp;
@@ -17,151 +11,33 @@ interface EmulationAppCardProps {
   onToggleFavorite: (app: EmulationApp) => void;
 }
 
-export const EmulationAppCard = ({
-  app,
-  onEdit,
-  onDelete,
-  onPlay,
-  onToggleFavorite,
-}: EmulationAppCardProps) => {
-  const [isHovered, setIsHovered] = useState(false);
-
-  const getStatusColor = (status: EmulationApp["status"]) => {
-    switch (status) {
-      case "installed":
-        return "bg-green-500";
-      case "not-installed":
-        return "bg-orange-500";
-      case "favorite":
-        return "bg-yellow-500";
-      default:
-        return "bg-gray-500";
-    }
-  };
-
-  const getStatusText = (status: EmulationApp["status"]) => {
-    switch (status) {
-      case "installed":
-        return "Installed";
-      case "not-installed":
-        return "Not Installed";
-      case "favorite":
-        return "Favorite";
-      default:
-        return "Unknown";
-    }
-  };
-
-  return (
-    <div
-      className="group relative w-48 h-48 cursor-pointer transition-all duration-300"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <div
-        className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/20 shadow-xl transition-all duration-300 hover:shadow-2xl hover:scale-105 hover:border-white/30"
-        style={{
-          background: `linear-gradient(135deg, ${app.color}22, ${app.color}11)`,
-          boxShadow: isHovered
-            ? `0 20px 40px -10px ${app.color}40, 0 0 0 1px ${app.color}30`
-            : `0 10px 30px -5px ${app.color}20`,
-        }}
-      >
-        <div className="absolute inset-0 rounded-2xl p-4 flex flex-col">
-          <div className="flex items-start justify-between mb-2">
-            <div
-              className="w-16 h-16 rounded-xl flex items-center justify-center text-4xl transition-transform duration-300 group-hover:scale-110 relative"
-              style={{
-                background: `linear-gradient(135deg, ${app.color}33, ${app.color}11)`,
-                boxShadow: `inset 0 2px 4px ${app.color}20, 0 4px 8px ${app.color}10`,
-              }}
-            >
-              <span>{app.icon}</span>
-              {isHovered && (
-                <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-br from-blue-400 to-purple-600 rounded-full flex items-center justify-center animate-pulse">
-                  <span className="text-xs">🎯</span>
-                </div>
-              )}
-            </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-white/80 hover:text-white hover:bg-white/10"
-                >
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-40">
-                <DropdownMenuItem
-                  onClick={() => onPlay(app)}
-                  className="flex items-center gap-2"
-                >
-                  <Play className="h-4 w-4" />
-                  Play
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => onToggleFavorite(app)}
-                  className="flex items-center gap-2"
-                >
-                  <Star
-                    className={`h-4 w-4 ${
-                      app.status === "favorite" ? "fill-yellow-400" : ""
-                    }`}
-                  />
-                  {app.status === "favorite" ? "Remove from Favorites" : "Add to Favorites"}
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => onEdit(app)}
-                  className="flex items-center gap-2"
-                >
-                  Edit
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => onDelete(app.id)}
-                  className="flex items-center gap-2 text-red-500"
-                >
-                  Delete
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-
-          <div className="flex-1 flex flex-col justify-end">
-            <h3 className="text-white font-bold text-sm leading-tight truncate pr-2">
-              {app.name}
-            </h3>
-            <div className="flex items-center gap-2 mt-2">
-              <span
-                className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                  getStatusColor(app.status)
-                } text-white`}
-              >
-                {getStatusText(app.status)}
-              </span>
-              <span className="text-white/60 text-xs font-medium">
-                {app.system}
-              </span>
-            </div>
-            {app.lastPlayed && (
-              <p className="text-white/50 text-xs mt-1">
-                Last played: {app.lastPlayed}
-              </p>
-            )}
-            {app.playtimeHours && (
-              <p className="text-white/50 text-xs">
-                {app.playtimeHours}h played
-              </p>
-            )}
-          </div>
-        </div>
-
-        <div
-          className="absolute bottom-0 left-0 right-0 h-2 rounded-b-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-          style={{ background: `linear-gradient(90deg, ${app.color}44, ${app.color}88)` }}
-        />
-      </div>
+export const EmulationAppCard = ({ app, onEdit, onDelete, onPlay, onToggleFavorite }: EmulationAppCardProps) => (
+  <article className="retro-card group relative flex min-w-0 flex-col overflow-hidden rounded-2xl">
+    <div className="relative flex h-32 items-center justify-center overflow-hidden border-b-4 border-[var(--retro-wood)] bg-[var(--retro-cream)] sm:h-36">
+      <div aria-hidden="true" className="absolute -left-8 -top-8 h-32 w-32 rotate-12 rounded-3xl opacity-20" style={{ backgroundColor: app.color }} />
+      <div aria-hidden="true" className="absolute -bottom-12 -right-8 h-32 w-32 rotate-45 rounded-3xl opacity-20" style={{ backgroundColor: app.color }} />
+      <span className="retro-game-icon relative text-6xl transition-transform duration-200 motion-safe:group-hover:scale-110">{app.icon}</span>
+      {app.status === "favorite" && <Star aria-label="Favorite" className="absolute left-3 top-3 h-6 w-6 fill-[var(--retro-gold)] text-amber-800" />}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon" aria-label={`Actions for ${app.name}`} className="absolute right-2 top-2 h-8 w-8 rounded-lg bg-white text-[var(--retro-ink)] hover:bg-amber-100 hover:text-[var(--retro-ink)]"><MoreHorizontal className="h-5 w-5" /></Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="retro-menu w-52 rounded-xl">
+          <DropdownMenuItem onClick={() => onPlay(app)} className="gap-2 rounded-lg focus:bg-amber-100 focus:text-amber-950"><Play className="h-4 w-4" />Play</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => onToggleFavorite(app)} className="gap-2 rounded-lg focus:bg-amber-100 focus:text-amber-950"><Star className="h-4 w-4" />{app.status === "favorite" ? "Remove Favorite" : "Add Favorite"}</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => onEdit(app)} className="gap-2 rounded-lg focus:bg-amber-100 focus:text-amber-950"><Pencil className="h-4 w-4" />Edit</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => onDelete(app.id)} className="gap-2 rounded-lg text-red-700 focus:bg-red-100 focus:text-red-800"><Trash2 className="h-4 w-4" />Delete</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
-  );
-};
+    <div className="flex flex-1 flex-col gap-2 bg-[var(--retro-paper)] p-3 text-[var(--retro-ink)] sm:p-4">
+      <p className="text-[10px] font-black uppercase tracking-widest text-[var(--retro-wood)]">{app.system}</p>
+      <h3 className="min-h-10 text-sm font-black leading-5">{app.name}</h3>
+      <div className="mt-auto flex flex-wrap items-center gap-2">
+        <span className={`rounded-md border px-2 py-1 text-[10px] font-bold ${app.status === "not-installed" ? "border-orange-300 bg-orange-100 text-orange-900" : app.status === "favorite" ? "border-yellow-400 bg-yellow-100 text-yellow-900" : "border-green-300 bg-green-100 text-green-900"}`}>{app.status === "not-installed" ? "Not installed" : app.status === "favorite" ? "Favorite" : "Installed"}</span>
+        {app.playtimeHours !== undefined && <span className="text-xs font-bold">{app.playtimeHours}h</span>}
+      </div>
+      {app.lastPlayed && <p className="text-[10px] text-[var(--retro-wood)]">Last played: {app.lastPlayed}</p>}
+    </div>
+  </article>
+);

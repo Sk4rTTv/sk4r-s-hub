@@ -106,10 +106,9 @@ export const EmulationAppList = ({
 
   return (
       <div className="w-full">
-        <div className="flex flex-col sm:flex-row gap-4 mb-6 p-4 rounded-2xl relative overflow-hidden" style={{ background: "linear-gradient(135deg, rgba(0, 160, 232, 0.15), rgba(0, 160, 232, 0.05))", border: "1px solid rgba(0, 160, 232, 0.2)" }}>
-          <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 via-transparent to-blue-500/10" />
+        <div className="retro-toolbar mb-8 flex flex-col gap-4 rounded-2xl p-4 xl:flex-row">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/50" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white" />
             <Input
                           type="text"
                           placeholder="Search games..."
@@ -134,7 +133,7 @@ export const EmulationAppList = ({
               </SelectContent>
             </Select>
   
-            <div className="flex items-center gap-1 border border-white/10 rounded-xl bg-white/5 p-1">
+            <div className="retro-sort flex flex-wrap items-center gap-1 rounded-xl border p-1">
               {(["name", "system", "lastPlayed", "playtime"] as const).map((column) => (
                 <Button
                   key={column}
@@ -172,14 +171,14 @@ export const EmulationAppList = ({
         </div>
 
       {filteredApps.length === 0 ? (
-        <div className="text-center py-16">
-          <div className="text-6xl mb-4">🎮</div>
-          <h3 className="text-xl font-semibold text-white/70 mb-2">No games found</h3>
-          <p className="text-white/40">Try adjusting your search or filters</p>
+        <div className="retro-hud rounded-2xl bg-[var(--retro-blue)] py-16 text-center">
+          <div className="mb-4 text-6xl">⭐</div>
+          <h3 className="mb-2 text-xl font-bold text-white">No adventures found</h3>
+          <p className="text-white">Try adjusting your search or filters</p>
         </div>
       ) : (
         <div
-          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4"
+          className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4 sm:gap-6"
           role="list"
           aria-label="Emulation apps"
         >
@@ -196,8 +195,8 @@ export const EmulationAppList = ({
         </div>
       )}
 
-      <div className="mt-6 text-center text-white/40 text-sm">
-        Showing {filteredApps.length} of {apps.length} games
+      <div className="retro-hud mt-8 text-center text-sm text-white">
+        Showing {filteredApps.length} of {apps.length} games • Your adventure collection
       </div>
     </div>
   );
