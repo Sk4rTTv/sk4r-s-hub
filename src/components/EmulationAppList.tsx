@@ -94,7 +94,7 @@ export const EmulationAppList = ({
   };
 
   const getSortIcon = (column: typeof sortBy) => {
-    if (sortBy !== column) return <ChevronDown className="h-4 w-4 text-white/50" />;
+    if (sortBy !== column) return <ChevronDown className="h-4 w-4 text-white" />;
     return (
       <ChevronDown
         className={`h-4 w-4 transition-transform ${
@@ -111,17 +111,17 @@ export const EmulationAppList = ({
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/50" />
             <Input
-              type="text"
-              placeholder="Search games..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-white/5 border-white/10 text-white placeholder-white/40 focus:border-blue-400/50 focus:ring-blue-400/20"
-            />
+                          type="text"
+                          placeholder="Search games..."
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className="pl-10 bg-white/10 border-white/20 text-white placeholder-white/60 focus:border-blue-400 focus:ring-blue-400/30"
+                        />
           </div>
   
           <div className="flex flex-wrap items-center gap-3 relative">
             <Select value={selectedSystem} onValueChange={setSelectedSystem}>
-              <SelectTrigger className="w-[180px] bg-white/5 border-white/10 text-white data-[placeholder]:text-white/40 focus:border-blue-400/50 focus:ring-blue-400/20">
+              <SelectTrigger className="w-[180px] bg-white/10 border-white/20 text-white focus:border-blue-400 focus:ring-blue-400/30">
                 <SelectValue placeholder="All Systems" />
               </SelectTrigger>
               <SelectContent className="bg-gray-900 border-gray-700">
@@ -141,9 +141,9 @@ export const EmulationAppList = ({
                   variant="ghost"
                   size="sm"
                   onClick={() => handleSortChange(column)}
-                  className="text-white/70 hover:text-white h-8 px-3 rounded-lg transition-colors"
+                  className="text-white hover:text-white h-8 px-3 rounded-lg transition-colors"
                 >
-                  <span className="flex items-center gap-1 text-xs">
+                  <span className="flex items-center gap-1 text-xs font-medium">
                     {column === "name" && "Name"}
                     {column === "system" && "System"}
                     {column === "lastPlayed" && "Last Played"}
@@ -162,7 +162,7 @@ export const EmulationAppList = ({
                   setSearchQuery("");
                   setSelectedSystem("all");
                 }}
-                className="text-white/70 hover:text-white h-8 px-3 rounded-lg"
+                className="text-white hover:text-white h-8 px-3 rounded-lg"
               >
                 <X className="h-4 w-4 mr-1" />
                 Clear
