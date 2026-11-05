@@ -15,7 +15,8 @@ interface EmulationAppCardProps {
 }
 
 export const EmulationAppCard = ({ app, onEdit, onArtwork, onDelete, onOpen, onLaunch, launchingAppId, onToggleFavorite }: EmulationAppCardProps) => (
-  <article className="cartridge group relative flex min-w-0 flex-col rounded-xl" style={{ backgroundColor: `color-mix(in srgb, ${app.color} 14%, #a5a9bc)` }}>
+  <article className="cartridge-dock relative flex min-w-0 flex-col">
+  <div className="cartridge group relative flex min-w-0 flex-1 flex-col rounded-xl" style={{ backgroundColor: `color-mix(in srgb, ${app.color} 14%, #a5a9bc)` }}>
     <div aria-hidden="true" className="cartridge-grip mx-auto mb-3 mt-1 h-4 w-2/3 rounded-sm" />
     <div className="cartridge-label cartridge-art relative flex h-32 items-center justify-center overflow-hidden rounded-t-lg bg-slate-100 sm:h-36">
       {app.artwork ? <img src={app.artwork} alt={`${app.name} app logo`} className="absolute inset-0 h-full w-full object-contain p-2" /> : <span className="text-6xl" aria-label="App icon">{app.icon}</span>}
@@ -45,5 +46,10 @@ export const EmulationAppCard = ({ app, onEdit, onArtwork, onDelete, onOpen, onL
       {window.emuDesktop && app.url && <Button variant="outline" size="sm" onClick={() => onOpen(app)} className="mt-2 h-8 rounded-lg border-slate-500 bg-white text-xs text-slate-900 hover:bg-blue-100 hover:text-slate-900"><ExternalLink className="mr-2 h-3 w-3" />Open link</Button>}
     </div>
     <div aria-hidden="true" className="cartridge-connector mx-auto mt-4 h-4 w-2/3 rounded-t-sm" />
+  </div>
+  <div aria-hidden="true" className="console-slot">
+    <span className="console-slot-light" />
+    <span className="console-slot-vents" />
+  </div>
   </article>
 );

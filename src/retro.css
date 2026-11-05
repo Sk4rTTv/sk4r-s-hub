@@ -26,8 +26,17 @@
 .retro-button { background: var(--retro-gold) !important; color: #201807 !important; border: 3px solid #211c16 !important; box-shadow: inset 0 3px #fff9b7, inset -3px -3px #c7a21e, 0 4px #a4771d, 0 7px #101025; font-size: 10px; line-height: 1.6; transition: transform .15s, box-shadow .15s; }
 .retro-button:hover { background: #fff18a !important; transform: translateY(-2px); }
 .retro-button:active { transform: translateY(3px); box-shadow: inset 0 3px #fff9b7, 0 2px #101025; }
-.cartridge { padding: 10px 12px 0; border: 3px solid #444861; border-top: 7px solid #cbd0e0; border-radius: 26px 26px 12px 12px !important; box-shadow: inset 5px 0 #e3e5f0, inset -5px 0 #64697f, inset 0 -4px #656a7f, 0 6px #060b26, 0 9px #060b2660; transition: transform .16s, box-shadow .16s; }
-.cartridge:hover, .cartridge:focus-within { transform: translateY(-4px); box-shadow: inset 5px 0 #e3e5f0, inset -5px 0 #64697f, 0 0 0 3px var(--retro-gold), 0 0 16px 3px #ffe34780, 0 8px #060b26; }
+.cartridge-dock { --cartridge-insert: 0rem; --cartridge-scale: 1; --slot-light: #8092b0; padding-bottom: 3rem; isolation: isolate; }
+.cartridge { z-index: 1; padding: 10px 12px 0; border: 3px solid #444861; border-top: 7px solid #cbd0e0; border-radius: 26px 26px 12px 12px !important; box-shadow: inset 5px 0 #e3e5f0, inset -5px 0 #64697f, inset 0 -4px #656a7f, 0 6px #060b26, 0 9px #060b2660; transform-origin: bottom center; transform: translateY(var(--cartridge-insert)) scale(var(--cartridge-scale)); transition: transform .4s cubic-bezier(.22, .8, .3, 1), box-shadow .4s ease; }
+.cartridge-dock:focus-within { --cartridge-insert: 1.5rem; --cartridge-scale: .98; --slot-light: #70f0b1; }
+@media (hover: hover) {
+  .cartridge-dock:hover { --cartridge-insert: 1.5rem; --cartridge-scale: .98; --slot-light: #70f0b1; }
+}
+.console-slot { position: absolute; bottom: 0; left: -2px; right: -2px; height: 3rem; z-index: 2; pointer-events: none; }
+.console-slot::before { content: ''; position: absolute; inset: 0 7% auto; height: 1.1rem; border: 3px solid #6c77a5; border-radius: 50%; background: #090e2c; box-shadow: inset 0 4px 5px #03071a, 0 -2px #a8b3d6; }
+.console-slot::after { content: ''; position: absolute; inset: .8rem 0 0; border: 3px solid #59648b; border-top: 4px solid #b9c6e5; border-radius: .5rem .5rem .9rem .9rem; background: #333e68; box-shadow: inset 0 -4px #222b4d, 0 4px #080d2d; }
+.console-slot-light { position: absolute; bottom: .7rem; left: 12%; z-index: 1; width: .4rem; height: .4rem; border-radius: 50%; background: var(--slot-light); box-shadow: 0 0 7px var(--slot-light); transition: background .2s .25s, box-shadow .2s .25s; }
+.console-slot-vents { position: absolute; bottom: .7rem; right: 12%; z-index: 1; width: 3px; height: .5rem; background: #141c3b; box-shadow: -6px 0 #141c3b, -12px 0 #141c3b, -18px 0 #141c3b, -24px 0 #141c3b; }
 .cartridge-grip { background: #71778e; box-shadow: inset 0 2px #e3e5f0, inset 0 5px #484d65, inset 0 7px #bfc5da, inset 0 10px #484d65, inset 0 12px #bfc5da; }
 .cartridge-label { border-left: 3px solid #60667e; border-right: 3px solid #60667e; }
 .cartridge-art { border: 5px solid #646a82; border-top-color: #4d546d; border-bottom-color: #dde0ed; box-shadow: 0 0 0 1px #d7dcec; image-rendering: pixelated; margin: 0 9px; }
@@ -90,7 +99,7 @@
 @keyframes scene-arrive { from { opacity: .25; } to { opacity: 1; } }
 @media (max-width: 480px) { .cartridge { padding-left: 6px; padding-right: 6px; } .cartridge-art { margin: 0 3px; } }
 @media (prefers-reduced-motion: reduce) {
-  .cartridge, .retro-backdrop, .scroll-reveal,
+  .cartridge, .console-slot-light, .retro-backdrop, .scroll-reveal,
   :is(.retro-world, .retro-dialog) :is(button, a.inline-flex) {
     transition: none !important;
     transform: none !important;

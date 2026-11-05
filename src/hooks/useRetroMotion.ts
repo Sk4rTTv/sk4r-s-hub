@@ -13,7 +13,7 @@ export function useRetroMotion(active: boolean, itemCount: number) {
       if (preference.matches) return;
       let frame = 0;
       let previousY = window.scrollY;
-      const targets = element.querySelectorAll<HTMLElement>(".console-hero, .retro-toolbar, .cartridge, .console-footer");
+      const targets = element.querySelectorAll<HTMLElement>(".console-hero, .retro-toolbar, .cartridge-dock, .console-footer");
       const observer = new IntersectionObserver(entries => {
         entries.forEach(entry => entry.target.classList.toggle("is-visible", entry.isIntersecting));
       }, { threshold: 0.08 });
