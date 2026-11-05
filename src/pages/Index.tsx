@@ -72,7 +72,7 @@ const Index = () => {
         <h1 aria-label="EmuHub" className="retro-title text-3xl sm:text-5xl md:text-6xl">
           {"EmuHub".split("").map((letter, i) => <span key={i} style={{ color: ["var(--retro-red)", "var(--retro-gold)", "#65c649", "#65c649", "var(--retro-red)", "var(--retro-gold)"][i], transform: `rotate(${i % 2 ? 2 : -2}deg)` }}>{letter}</span>)}
         </h1>
-        <p className="retro-hud mt-6 text-[10px] sm:text-xs">All your emulation apps. One hub.</p>
+        <p className="retro-hud mt-6 text-[10px] sm:text-xs">All your emulation apps One hub.</p>
         <Button onClick={() => { setEditing(undefined); setShowAddForm(true); }} className="retro-button mt-7 h-12 rounded-xl px-7"><Plus className="mr-2 h-5 w-5" /> Add App</Button>
       </section>
       <main className="console-library relative z-10 mx-auto max-w-6xl p-4 sm:p-7"><EmulationAppList apps={apps} onEdit={handleEdit} onArtwork={setArtworkApp} onDelete={handleDelete} onOpen={handleOpen} onToggleFavorite={handleToggleFavorite} /></main>
