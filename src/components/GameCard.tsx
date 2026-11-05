@@ -1,6 +1,7 @@
 import { File, Pencil, Trash2, ImagePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CartridgeDisplay } from "./CartridgeDisplay";
+import { MetadataDetails } from "./MetadataDetails";
 import type { LibraryGame } from "@/types/game";
 
 export function GameCard({ game, onEdit, onCover, onRemove }: { game: LibraryGame; onEdit: (game: LibraryGame) => void; onCover: (game: LibraryGame) => void; onRemove: (id: string) => void }) {
@@ -11,6 +12,7 @@ export function GameCard({ game, onEdit, onCover, onRemove }: { game: LibraryGam
       <h4 className="pixel-font break-words text-xs leading-6 text-yellow-100">{game.name}</h4>
       <p className="flex min-w-0 items-center gap-2 text-xs text-blue-100" title={game.relativePath}><File className="h-4 w-4 shrink-0" /><span className="truncate">{game.fileName}</span></p>
       <p className="text-xs text-blue-200">Local game file · {game.file ? `${(game.file.size / 1048576).toFixed(1)} MB` : "Directory entry"}</p>
+      <MetadataDetails metadata={game.metadata} directoryKey={game.directoryKey} title={game.name} system={game.system} />
       <div className="mt-auto flex flex-wrap gap-2 pt-2">
         <Button onClick={() => onCover(game)} aria-label={`Choose cover for ${game.name}`} className="h-auto min-h-9 w-full rounded-lg border border-cyan-300 bg-cyan-800 py-2 text-xs text-white hover:bg-cyan-700"><ImagePlus className="mr-2 h-4 w-4" />Covers</Button>
         <Button onClick={() => onEdit(game)} variant="outline" className="h-auto min-h-9 flex-1 rounded-lg border-indigo-400 bg-indigo-900 py-2 text-xs text-white"><Pencil className="mr-2 h-4 w-4" />Edit game</Button>

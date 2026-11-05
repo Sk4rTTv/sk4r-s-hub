@@ -23,7 +23,7 @@ async function scanAppDirectory(root, kind = 'apps') {
         }
         const filePath = path.join(resolved, entry.name);
         const extension = path.extname(entry.name).toLowerCase();
-        const supported = kind === 'games' ? Object.hasOwn(gameFormats, extension) : extension === '.exe';
+        const supported = kind === 'both' ? extension === '.exe' || Object.hasOwn(gameFormats, extension) : kind === 'games' ? Object.hasOwn(gameFormats, extension) : extension === '.exe';
         if (entry.isDirectory()) {
           if (depth < 12) queue.push({ folder: filePath, depth: depth + 1 });
           else truncated = true;

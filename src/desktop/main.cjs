@@ -5,6 +5,7 @@ const { pathToFileURL } = require('node:url');
 const { randomUUID } = require('node:crypto');
 const { spawn } = require('node:child_process');
 const { scanAppDirectory } = require('./directory-scan.cjs');
+const { installLibraryScanner } = require('./library-scanner.cjs');
 
 let window;
 const executables = new Map();
@@ -21,6 +22,16 @@ function trustedFrame(frame) {
 function authorize(event) {
   if (!trustedFrame(event.senderFrame)) throw new Error('Untrusted launcher request.');
 }
+const stopLibraryScanner = installLibraryScanner({
+  ipcMain, dialog, getWindow: () => window, authorize,
+  canSend: () => window && !window.isDestroyed() && trustedFrame(window.webContents.mainFrame),
+  registerEntry: filePath => {
+    const key = filePath.toLowerCase();
+    if (!directoryEntries.has(key)) directoryEntries.set(key, randomUUID());
+    return directoryEntries.get(key);
+  },
+});
+app.on('before-quit', stopLibraryScanner);
 async function checkedExecutable(filePath) {
   const resolved = await fs.realpath(filePath);
   if (!path.isAbsolute(resolved) || path.extname(resolved).toLowerCase() !== '.exe' || !(await fs.stat(resolved)).isFile()) throw new Error('Choose an installed Windows executable (.exe).');

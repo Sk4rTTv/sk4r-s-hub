@@ -9,4 +9,5 @@ export interface LibraryGame {
   relativePath: string;
   directoryKey: string;
   file?: File;
+  metadata?: import("./library-scanner").LibraryMetadata;
 }

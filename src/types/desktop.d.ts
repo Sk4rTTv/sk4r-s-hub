@@ -26,6 +26,14 @@ declare global {
       launchExecutable: (id: string) => Promise<{ launched: boolean }>;
       listProjectionSources: () => Promise<ProjectionSource[]>;
       selectProjectionSource: (id: string) => Promise<void>;
+      scannerState: () => Promise<import("./library-scanner").ScannerSnapshot>;
+      connectScanner: (credentials: import("./library-scanner").ScannerCredentials) => Promise<{ connected: boolean }>;
+      startScanner: (options: { kind: "apps" | "games" | "both"; system: string }) => Promise<{ id: string } | null>;
+      stopScanner: (id: string) => Promise<void>;
+      resumeScanner: () => Promise<void>;
+      retryScannerMetadata: (id: string, system: string, title: string) => Promise<void>;
+      disconnectScanner: () => Promise<void>;
+      onScannerEvent: (callback: (event: import("./library-scanner").ScannerEvent) => void) => () => void;
     };
   }
 }

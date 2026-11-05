@@ -8,6 +8,7 @@ export interface EmulationApp {
   url?: string;
   appFile?: File;
   directoryKey?: string;
+  metadata?: import("./library-scanner").LibraryMetadata;
   nativeExecutable?: import("./desktop").NativeExecutable;
   status: "installed" | "not-installed" | "favorite";
 }
@@ -20,6 +21,7 @@ export const SYSTEMS = [
   "GameCube",
   "Wii",
   "Game Boy",
+  "Game Boy Color",
   "Game Boy Advance",
   "Nintendo DS",
   "Nintendo 3DS",
