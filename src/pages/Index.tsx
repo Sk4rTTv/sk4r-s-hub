@@ -45,7 +45,7 @@ const Index = () => {
   const video = useRef<HTMLVideoElement>(null);
   const urls = useRef<string[]>([]);
   const { enabled, setEnabled } = useRetroSounds();
-  const inHub = ["/hub", "/settings"].includes(useLocation().pathname.replace(/\/$/, ""));
+  const inHub = ["/hub", "/settings", "/websites"].includes(useLocation().pathname.replace(/\/$/, ""));
   const [sceneId, setSceneId] = useState(retroScenes[0].id);
   const [shuffle, setShuffle] = useState(false);
   const world = useRetroMotion(!inHub && started, apps.length + games.length, libraryTab);

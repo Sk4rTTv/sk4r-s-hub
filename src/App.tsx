@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import ProjectionHub from "./pages/ProjectionHub";
 import Settings from "./pages/Settings";
+import Websites from "./pages/Websites";
 import { InterfaceSettingsProvider } from "./contexts/InterfaceSettings";
 
 const queryClient = new QueryClient();
@@ -23,6 +24,7 @@ const App = () => (
           <Route path="/" element={<Index />}>
             <Route path="hub" element={<ProjectionHub />} />
             <Route path="settings" element={<Settings />} />
+            <Route path="websites" element={<Websites />} />
           </Route>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

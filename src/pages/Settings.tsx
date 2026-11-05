@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
-import { ArrowLeft, Monitor, Settings as SettingsIcon, Type, PanelTop, RotateCcw, Gamepad2 } from "lucide-react";
+import { ArrowLeft, Monitor, Settings as SettingsIcon, Type, PanelTop, RotateCcw, Gamepad2, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { UiColorSettings } from "@/components/UiColorSettings";
 import { useInterfaceSettings } from "@/contexts/InterfaceSettings";
 import "@/retro.css";
 
@@ -12,16 +13,18 @@ export default function Settings() {
       <header className="console-header flex flex-wrap items-center justify-between gap-4 p-5 sm:px-7">
         <h1 className="retro-hud flex items-center gap-3 text-xs leading-6"><SettingsIcon className="h-7 w-7 text-yellow-300" />Settings</h1>
         <nav aria-label="Settings navigation" className="flex flex-wrap gap-3">
+          <Button asChild variant="outline" className="rounded-xl bg-blue-950 text-white"><Link to="/websites"><Globe className="mr-2 h-4 w-4" />Websites</Link></Button>
           <Button asChild variant="outline" className="rounded-xl bg-blue-950 text-white"><Link to="/hub"><Monitor className="mr-2 h-4 w-4" />Projection Hub</Link></Button>
           <Button asChild variant="outline" className="rounded-xl bg-blue-950 text-white"><Link to="/"><ArrowLeft className="mr-2 h-4 w-4" />Back to title</Link></Button>
         </nav>
       </header>
       <main className="space-y-6 p-4 sm:p-7">
         <section className="rounded-2xl border-2 border-indigo-400 bg-indigo-950 p-5 sm:p-7">
-          <p className="retro-hud mb-3 text-xs text-yellow-300">YOUR HUB, YOUR SIZE</p>
-          <h2 className="text-2xl font-bold">Make everything comfortable.</h2>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-blue-100">Changes apply instantly to the title screen, Projection Hub, and dialogs. Interface size scales the overall layout; text size adds a separate adjustment to the lettering.</p>
+          <p className="retro-hud mb-3 text-xs text-yellow-300">YOUR HUB, YOUR STYLE</p>
+          <h2 className="text-2xl font-bold">Make everything your own.</h2>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-blue-100">Colors and sizes apply instantly throughout EmuHub, including the new Websites menu. Interface size scales the overall layout; text size adjusts the lettering separately.</p>
         </section>
+        <UiColorSettings />
         <div className="grid gap-5 md:grid-cols-2">
           <section className="retro-toolbar space-y-5 rounded-2xl p-5">
             <div className="flex items-center gap-3"><Type className="h-7 w-7 text-yellow-300" /><h2 className="text-lg font-bold">Text size</h2><output htmlFor="text-size" className="ml-auto rounded-lg bg-blue-950 px-3 py-2 font-mono text-sm text-yellow-300">{textSize}%</output></div>

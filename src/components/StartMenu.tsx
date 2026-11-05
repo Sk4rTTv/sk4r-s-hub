@@ -1,6 +1,6 @@
 import { useEffect, useRef, type KeyboardEvent } from "react";
 import { Link } from "react-router-dom";
-import { Gamepad2, Play, Monitor, Settings, ChevronRight } from "lucide-react";
+import { Gamepad2, Play, Monitor, Settings, ChevronRight, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function StartMenu({ onStart }: { onStart: () => void }) {
@@ -21,6 +21,7 @@ export function StartMenu({ onStart }: { onStart: () => void }) {
     <nav aria-label="Start menu" onKeyDown={navigate} className="start-menu space-y-3 rounded-2xl border-2 border-indigo-300 bg-blue-950/95 p-4 sm:p-5">
       <Button ref={start} onClick={onStart} className="start-menu-option retro-button w-full justify-start rounded-xl px-4 py-4"><ChevronRight className="menu-cursor mr-2 h-4 w-4 shrink-0" /><Play className="mr-3 h-5 w-5 shrink-0" />Start</Button>
       <Button asChild variant="outline" className="start-menu-option w-full justify-start rounded-xl border-2 border-indigo-300 bg-indigo-950 px-4 py-4 text-white"><Link to="/hub"><ChevronRight className="menu-cursor mr-2 h-4 w-4 shrink-0" /><Monitor className="mr-3 h-5 w-5 shrink-0" />Projection Hub</Link></Button>
+      <Button asChild variant="outline" className="start-menu-option w-full justify-start rounded-xl border-2 border-indigo-300 bg-indigo-950 px-4 py-4 text-white"><Link to="/websites"><ChevronRight className="menu-cursor mr-2 h-4 w-4 shrink-0" /><Globe className="mr-3 h-5 w-5 shrink-0" />Websites</Link></Button>
       <Button asChild variant="outline" className="start-menu-option w-full justify-start rounded-xl border-2 border-indigo-300 bg-indigo-950 px-4 py-4 text-white"><Link to="/settings"><ChevronRight className="menu-cursor mr-2 h-4 w-4 shrink-0" /><Settings className="mr-3 h-5 w-5 shrink-0" />Settings</Link></Button>
     </nav>
     <p className="mt-5 text-xs leading-6 text-blue-100">Choose an option to begin.<br /><span className="text-blue-200">↑ ↓ to select · Enter to open</span></p>
