@@ -1,5 +1,5 @@
 import { EmulationApp } from "@/types/emulation";
-import { Star, MoreHorizontal, ExternalLink, Pencil, Trash2, ImagePlus, File } from "lucide-react";
+import { Star, MoreHorizontal, ExternalLink, Pencil, Trash2, ImagePlus, File, Play } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 
@@ -9,10 +9,12 @@ interface EmulationAppCardProps {
   onArtwork: (app: EmulationApp) => void;
   onDelete: (id: string) => void;
   onOpen: (app: EmulationApp) => void;
+  onLaunch: (app: EmulationApp) => void;
+  launchingAppId: string | null;
   onToggleFavorite: (app: EmulationApp) => void;
 }
 
-export const EmulationAppCard = ({ app, onEdit, onArtwork, onDelete, onOpen, onToggleFavorite }: EmulationAppCardProps) => (
+export const EmulationAppCard = ({ app, onEdit, onArtwork, onDelete, onOpen, onLaunch, launchingAppId, onToggleFavorite }: EmulationAppCardProps) => (
   <article className="cartridge group relative flex min-w-0 flex-col rounded-xl" style={{ backgroundColor: `color-mix(in srgb, ${app.color} 14%, #a5a9bc)` }}>
     <div aria-hidden="true" className="cartridge-grip mx-auto mb-3 mt-1 h-4 w-2/3 rounded-sm" />
     <div className="cartridge-label cartridge-art relative flex h-32 items-center justify-center overflow-hidden rounded-t-lg bg-slate-100 sm:h-36">
@@ -32,10 +34,15 @@ export const EmulationAppCard = ({ app, onEdit, onArtwork, onDelete, onOpen, onT
     <div className="cartridge-label flex flex-1 flex-col gap-2 rounded-b-lg bg-[var(--retro-paper)] p-3 text-[var(--retro-ink)] sm:p-4">
       <p className="pixel-font break-words text-[8px] uppercase leading-4 text-[var(--retro-wood)]">{app.system}</p>
       <h3 className="pixel-font min-h-10 break-words text-[9px] leading-5 sm:text-[10px]">{app.name}</h3>
-      {app.appFile && <p className="flex items-center gap-1 text-[10px]" title={app.appFile.name}><File className="h-3 w-3 shrink-0" /><span className="truncate">{app.appFile.name}</span></p>}
+      {(app.nativeExecutable || app.appFile) && <p className="flex items-center gap-1 text-[10px]" title={app.nativeExecutable?.fileName ?? app.appFile?.name}><File className="h-3 w-3 shrink-0" /><span className="truncate">{app.nativeExecutable?.fileName ?? app.appFile?.name}</span></p>}
       <div className="mt-auto flex flex-wrap items-center gap-2"><span className={`rounded-md border px-2 py-1 text-[10px] font-bold ${app.status === "not-installed" ? "border-orange-300 bg-orange-100 text-orange-900" : app.status === "favorite" ? "border-yellow-400 bg-yellow-100 text-yellow-900" : "border-green-300 bg-green-100 text-green-900"}`}>{app.status === "not-installed" ? "Not installed" : app.status === "favorite" ? "Favorite" : "Installed"}</span></div>
+      <Button disabled={launchingAppId !== null || (!window.emuDesktop && !app.url)} aria-label={`Open ${app.name}`} onClick={() => window.emuDesktop ? onLaunch(app) : onOpen(app)} className="retro-button mt-3 h-10 rounded-lg px-2">
+        <Play className="mr-2 h-4 w-4" />{launchingAppId === app.id ? "Opening…" : window.emuDesktop ? "Launch app" : app.url ? "Open app" : "Launch app"}
+      </Button>
+      {!window.emuDesktop && !app.url && <p className="text-[10px] leading-4">Native launching requires EmuHub for Windows.</p>}
+      {window.emuDesktop && !app.nativeExecutable && <p className="text-[10px] leading-4">Choose its installed .exe when launching for the first time.</p>}
       <Button variant="outline" size="sm" onClick={() => onArtwork(app)} className="mt-2 h-8 rounded-lg border-slate-500 bg-white text-[10px] text-slate-900 hover:bg-blue-100 hover:text-slate-900"><ImagePlus className="mr-1 h-3 w-3" />{app.artwork ? "Change image" : "Add image"}</Button>
-      {app.url && <Button variant="outline" size="sm" onClick={() => onOpen(app)} className="mt-2 h-8 rounded-lg border-slate-500 bg-white text-xs text-slate-900 hover:bg-blue-100 hover:text-slate-900"><ExternalLink className="mr-2 h-3 w-3" />Open link</Button>}
+      {window.emuDesktop && app.url && <Button variant="outline" size="sm" onClick={() => onOpen(app)} className="mt-2 h-8 rounded-lg border-slate-500 bg-white text-xs text-slate-900 hover:bg-blue-100 hover:text-slate-900"><ExternalLink className="mr-2 h-3 w-3" />Open link</Button>}
     </div>
     <div aria-hidden="true" className="cartridge-connector mx-auto mt-4 h-4 w-2/3 rounded-t-sm" />
   </article>

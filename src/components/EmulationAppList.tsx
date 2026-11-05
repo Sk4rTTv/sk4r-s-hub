@@ -12,10 +12,12 @@ interface EmulationAppListProps {
   onArtwork: (app: EmulationApp) => void;
   onDelete: (id: string) => void;
   onOpen: (app: EmulationApp) => void;
+  onLaunch: (app: EmulationApp) => void;
+  launchingAppId: string | null;
   onToggleFavorite: (app: EmulationApp) => void;
 }
 
-export const EmulationAppList = ({ apps, onEdit, onArtwork, onDelete, onOpen, onToggleFavorite }: EmulationAppListProps) => {
+export const EmulationAppList = ({ apps, onEdit, onArtwork, onDelete, onOpen, onLaunch, launchingAppId, onToggleFavorite }: EmulationAppListProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSystem, setSelectedSystem] = useState("all");
   const [sortBy, setSortBy] = useState<"name" | "system">("name");
@@ -40,7 +42,7 @@ export const EmulationAppList = ({ apps, onEdit, onArtwork, onDelete, onOpen, on
         {(searchQuery || selectedSystem !== "all") && <Button variant="ghost" size="sm" onClick={() => { setSearchQuery(""); setSelectedSystem("all"); }} className="rounded-lg text-white hover:bg-blue-800 hover:text-white"><X className="mr-1 h-4 w-4" />Clear</Button>}
       </div>
     </div>
-    {filteredApps.length ? <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 sm:gap-7 lg:grid-cols-4" role="list" aria-label="Emulator apps">{filteredApps.map(app => <EmulationAppCard key={app.id} app={app} onEdit={onEdit} onArtwork={onArtwork} onDelete={onDelete} onOpen={onOpen} onToggleFavorite={onToggleFavorite} />)}</div> : <div className="rounded-2xl border-2 border-indigo-400 bg-[var(--retro-blue)] px-5 py-12 text-center">
+    {filteredApps.length ? <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 sm:gap-7 lg:grid-cols-4" role="list" aria-label="Emulator apps">{filteredApps.map(app => <EmulationAppCard key={app.id} app={app} onEdit={onEdit} onArtwork={onArtwork} onDelete={onDelete} onOpen={onOpen} onLaunch={onLaunch} launchingAppId={launchingAppId} onToggleFavorite={onToggleFavorite} />)}</div> : <div className="rounded-2xl border-2 border-indigo-400 bg-[var(--retro-blue)] px-5 py-12 text-center">
       <Gamepad2 className="mx-auto mb-5 h-16 w-16 text-[var(--retro-gold)]" />
       <h3 className="retro-hud mb-4 text-xs text-white sm:text-sm">{apps.length ? "No apps found" : "Your app collection starts here"}</h3>
       <p className="mx-auto max-w-md text-sm leading-6 text-blue-100">{apps.length ? "Try a different search or clear your filters." : "Use Add App to choose an app file or enter your app details. Once added, use Add image on its cartridge to customize the artwork."}</p>

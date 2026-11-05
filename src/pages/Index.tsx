@@ -16,6 +16,8 @@ const Index = () => {
   const [editing, setEditing] = useState<EmulationApp>();
   const [artworkApp, setArtworkApp] = useState<EmulationApp>();
   const [apps, setApps] = useState<EmulationApp[]>([]);
+  const [launchingAppId, setLaunchingAppId] = useState<string | null>(null);
+  const launchPending = useRef(false);
   const [showSettings, setShowSettings] = useState(false);
   const [background, setBackground] = useState<BackgroundMedia | null>(null);
   const [dim, setDim] = useState(35);
@@ -47,6 +49,24 @@ const Index = () => {
   const handleDelete = (id: string) => setApps(prev => prev.filter(app => app.id !== id));
   const handleOpen = (app: EmulationApp) => {
     if (app.url) window.open(app.url, "_blank", "noopener,noreferrer");
+  };
+  const handleLaunch = async (app: EmulationApp) => {
+    const desktop = window.emuDesktop;
+    if (!desktop || launchPending.current) return;
+    launchPending.current = true;
+    setLaunchingAppId(app.id);
+    try {
+      const executable = app.nativeExecutable ?? await desktop.selectExecutable();
+      if (!executable) return;
+      if (!app.nativeExecutable) setApps(prev => prev.map(entry => entry.id === app.id ? { ...entry, nativeExecutable: executable } : entry));
+      const result = await desktop.launchExecutable(executable.id);
+      if (result.launched) toast.success(`${app.name} started in its own Windows window.`);
+    } catch {
+      toast.error("Could not start this app. Use Edit app to select its installed .exe again, and check that its supporting files are present.");
+    } finally {
+      launchPending.current = false;
+      setLaunchingAppId(null);
+    }
   };
   const handleToggleFavorite = (app: EmulationApp) => setApps(prev => prev.map(a => a.id === app.id ? { ...a, status: a.status === "favorite" ? "installed" : "favorite" } : a));
   const closeForm = () => { setShowAddForm(false); setEditing(undefined); };
@@ -81,7 +101,7 @@ const Index = () => {
           <Button asChild className="retro-button h-12 rounded-xl px-7"><Link to="/hub"><Monitor className="mr-2 h-5 w-5" />App Projection Hub</Link></Button>
         </div>
       </section>
-      <main className="console-library relative z-10 mx-auto max-w-6xl p-4 sm:p-7"><EmulationAppList apps={apps} onEdit={handleEdit} onArtwork={setArtworkApp} onDelete={handleDelete} onOpen={handleOpen} onToggleFavorite={handleToggleFavorite} /></main>
+      <main className="console-library relative z-10 mx-auto max-w-6xl p-4 sm:p-7"><EmulationAppList apps={apps} onEdit={handleEdit} onArtwork={setArtworkApp} onDelete={handleDelete} onOpen={handleOpen} onLaunch={handleLaunch} launchingAppId={launchingAppId} onToggleFavorite={handleToggleFavorite} /></main>
       <footer className="console-footer relative z-10 flex flex-wrap items-center justify-center gap-6 px-4 py-5 text-xs"><span className="flex items-center gap-2"><Gamepad2 className="h-6 w-6 text-slate-300" /> Your app collection</span><span className="flex items-center gap-2"><Star className="h-5 w-5 fill-yellow-400 text-yellow-400" /> {apps.length} apps</span></footer>
       </div>
       {showAddForm && <AddEmulationApp app={editing} onAdd={handleSave} onClose={closeForm} />}

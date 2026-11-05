@@ -46,5 +46,18 @@
 .retro-dialog { font-family: 'Trebuchet MS', Verdana, sans-serif; border: 5px solid #6461a5; background: #e4e6f1; color: #171b31; box-shadow: inset 0 3px #c4c7ef, 0 8px #080d32; }
 .console-footer { border-top: 2px solid #525892; background: #0c1135; font-family: 'Press Start 2P', monospace; font-size: 9px; line-height: 1.8; box-shadow: inset 0 3px #20285d; }
 .console-key { display: inline-flex; align-items: center; justify-content: center; height: 26px; width: 26px; border-radius: 50%; border: 2px solid #091024; box-shadow: inset 2px 2px #ffffff80, 0 2px #000720; }
+:is(.retro-world, .retro-dialog) :is(button, a.inline-flex):not(:disabled):not([aria-disabled='true']):is(:hover, :focus-visible) {
+  background-color: var(--retro-gold) !important;
+  color: var(--retro-ink) !important;
+  outline: 2px solid var(--retro-gold);
+  outline-offset: 3px;
+  box-shadow: inset 0 2px #fff9b7, 0 0 14px #ffe34780;
+  cursor: pointer;
+}
+.retro-menu [role='menuitem']:not([data-disabled]):is(:hover, :focus), [role='option']:not([data-disabled]):is(:hover, :focus, [data-highlighted]) {
+  background-color: var(--retro-gold) !important;
+  color: var(--retro-ink) !important;
+  box-shadow: inset 0 0 0 2px #c7a21e;
+}
 @media (max-width: 480px) { .cartridge { padding-left: 6px; padding-right: 6px; } .cartridge-art { margin: 0 3px; } }
 @media (prefers-reduced-motion: reduce) { .cartridge, .retro-button { transition: none; transform: none !important; } }
