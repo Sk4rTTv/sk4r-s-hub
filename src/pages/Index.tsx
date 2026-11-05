@@ -8,6 +8,8 @@ import { useEffect, useRef, useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useRetroSounds } from "@/hooks/useRetroSounds";
+import { retroScenes } from "@/lib/retro-scenes";
+import { useRetroMotion } from "@/hooks/useRetroMotion";
 import { toast } from "sonner";
 import "@/retro.css";
 
@@ -26,6 +28,23 @@ const Index = () => {
   const urls = useRef<string[]>([]);
   const { enabled, setEnabled } = useRetroSounds();
   const inHub = useLocation().pathname.replace(/\/$/, "") === "/hub";
+  const [sceneId, setSceneId] = useState(retroScenes[0].id);
+  const [shuffle, setShuffle] = useState(false);
+  const world = useRetroMotion(!inHub, apps.length);
+  const scene = retroScenes.find(entry => entry.id === sceneId)!;
+  const nextScene = () => setSceneId(current => {
+    const choices = retroScenes.filter(entry => entry.id !== current);
+    return choices[Math.floor(Math.random() * choices.length)].id;
+  });
+  const selectScene = (id: string) => { setSceneId(id); setBackground(null); setShuffle(false); };
+  const changeBackground = (media: BackgroundMedia | null) => { setBackground(media); setShuffle(false); };
+  useEffect(() => {
+    if (!shuffle || inHub) return;
+    const timer = window.setInterval(() => {
+      if (!document.hidden) nextScene();
+    }, 20000);
+    return () => window.clearInterval(timer);
+  }, [shuffle, inHub]);
 
   const upload = (file: File) => {
     const url = URL.createObjectURL(file);
@@ -74,11 +93,11 @@ const Index = () => {
 
   return (
     <>
-    <div hidden={inHub} className="retro-world relative min-h-screen overflow-x-hidden px-2 py-3 text-white sm:p-6">
-      {background && <div className="pointer-events-none fixed inset-0">
-        {background.type === "video" ? <video key={background.url} ref={video} src={background.url} muted loop playsInline autoPlay className="h-full w-full object-cover" onError={mediaError} /> : <img src={background.url} alt="" className="h-full w-full object-cover" onError={mediaError} />}
+    <div ref={world} hidden={inHub} className="retro-world relative min-h-screen overflow-x-hidden px-2 py-3 text-white sm:p-6">
+      <div className="retro-backdrop pointer-events-none fixed" aria-hidden="true">
+        {background?.type === "video" ? <video key={background.url} ref={video} src={background.url} muted loop playsInline autoPlay className="h-full w-full object-cover" onError={mediaError} /> : <img key={background?.url ?? scene.url} src={background?.url ?? scene.url} alt="" className="scene-image h-full w-full object-cover" onError={background ? mediaError : undefined} />}
         <div className="absolute inset-0 bg-blue-950" style={{ opacity: dim / 100 }} />
-      </div>}
+      </div>
       <div className="console-shell relative mx-auto max-w-6xl overflow-hidden rounded-3xl">
       <div aria-hidden="true" className="crt-lines pointer-events-none absolute inset-0 z-40" />
       <header className="console-header relative z-10 mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-5 py-4 sm:px-8">
@@ -90,7 +109,8 @@ const Index = () => {
           {background?.type === "video" && <Button variant="outline" aria-label={paused ? "Play background video" : "Pause background video"} onClick={() => setPaused(!paused)} className="rounded-xl border-blue-200 bg-blue-900 text-white hover:bg-blue-800 hover:text-white">{paused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}</Button>}
         </div>
       </header>
-      <section className="console-hero relative z-10 mx-auto px-5 pb-10 pt-9 text-center sm:pb-12 sm:pt-12" style={background ? { backgroundImage: "none", backgroundColor: "transparent" } : undefined}>
+      <section className="console-hero relative z-10 mx-auto px-5 pb-10 pt-9 text-center sm:pb-12 sm:pt-12" style={{ backgroundImage: background ? "none" : `url("${scene.url}")`, backgroundColor: "transparent" }}>
+        {!background && <div aria-hidden="true" className="hero-shade pointer-events-none absolute inset-0 bg-blue-950" style={{ opacity: dim / 100 }} />}
         <p className="retro-hud mb-5 text-[8px] leading-6 tracking-wide sm:text-[10px]">— APP SELECT —</p>
         <h1 aria-label="EmuHub" className="retro-title text-3xl sm:text-5xl md:text-6xl">
           {"EmuHub".split("").map((letter, i) => <span key={i} style={{ color: ["var(--retro-red)", "var(--retro-gold)", "#65c649", "#65c649", "var(--retro-red)", "var(--retro-gold)"][i], transform: `rotate(${i % 2 ? 2 : -2}deg)` }}>{letter}</span>)}
@@ -110,7 +130,7 @@ const Index = () => {
         setArtworkApp(undefined);
         toast.success("Cartridge image updated!");
       }} />}
-      {showSettings && <AppearanceSettings onClose={() => setShowSettings(false)} background={background} onBackground={setBackground} upload={upload} dim={dim} onDim={setDim} paused={paused} onPaused={setPaused} />}
+      {showSettings && <AppearanceSettings onClose={() => setShowSettings(false)} background={background} onBackground={changeBackground} sceneId={sceneId} onScene={selectScene} shuffle={shuffle} onShuffle={value => { setShuffle(value); if (value) { setBackground(null); nextScene(); } }} onNext={() => { setBackground(null); nextScene(); }} upload={upload} dim={dim} onDim={setDim} paused={paused} onPaused={setPaused} />}
     </div>
     <Outlet context={{ apps }} />
     </>
