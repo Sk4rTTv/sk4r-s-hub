@@ -3,7 +3,7 @@ import { AddEmulationApp } from "@/components/AddEmulationApp";
 import { CartridgeArtwork } from "@/components/CartridgeArtwork";
 import { AppearanceSettings, type BackgroundMedia } from "@/components/AppearanceSettings";
 import { EmulationApp } from "@/types/emulation";
-import { Plus, Star, Gamepad2, ImagePlus, Volume2, VolumeX, Pause, Play, Monitor } from "lucide-react";
+import { Plus, Star, Gamepad2, ImagePlus, Volume2, VolumeX, Pause, Play, Monitor, Settings } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -27,7 +27,7 @@ const Index = () => {
   const video = useRef<HTMLVideoElement>(null);
   const urls = useRef<string[]>([]);
   const { enabled, setEnabled } = useRetroSounds();
-  const inHub = useLocation().pathname.replace(/\/$/, "") === "/hub";
+  const inHub = ["/hub", "/settings"].includes(useLocation().pathname.replace(/\/$/, ""));
   const [sceneId, setSceneId] = useState(retroScenes[0].id);
   const [shuffle, setShuffle] = useState(false);
   const world = useRetroMotion(!inHub, apps.length);
@@ -106,16 +106,17 @@ const Index = () => {
           <div className="retro-hud mr-2 flex items-center gap-2 text-xs"><Star className="h-6 w-6 fill-[var(--retro-gold)] text-[var(--retro-gold)]" /><span>× {String(apps.length).padStart(2, "0")}</span></div>
           <Button variant="outline" onClick={() => setEnabled(!enabled)} aria-pressed={enabled} aria-label={enabled ? "Mute retro sounds" : "Enable retro sounds"} className="h-10 rounded-xl border-2 border-blue-200 bg-blue-900 text-white hover:bg-blue-800 hover:text-white">{enabled ? <Volume2 className="mr-2 h-4 w-4" /> : <VolumeX className="mr-2 h-4 w-4" />}Sound {enabled ? "on" : "off"}</Button>
           <Button variant="outline" onClick={() => setShowSettings(true)} className="h-10 rounded-xl border-2 border-blue-200 bg-blue-900 text-white hover:bg-blue-800 hover:text-white"><ImagePlus className="mr-2 h-4 w-4" />Background</Button>
+          <Button asChild variant="outline" className="h-10 rounded-xl border-2 border-blue-200 bg-blue-900 text-white hover:bg-blue-800 hover:text-white"><Link to="/settings"><Settings className="mr-2 h-4 w-4" />Settings</Link></Button>
           {background?.type === "video" && <Button variant="outline" aria-label={paused ? "Play background video" : "Pause background video"} onClick={() => setPaused(!paused)} className="rounded-xl border-blue-200 bg-blue-900 text-white hover:bg-blue-800 hover:text-white">{paused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}</Button>}
         </div>
       </header>
       <section className="console-hero relative z-10 mx-auto px-5 pb-10 pt-9 text-center sm:pb-12 sm:pt-12" style={{ backgroundImage: background ? "none" : `url("${scene.url}")`, backgroundColor: "transparent" }}>
         {!background && <div aria-hidden="true" className="hero-shade pointer-events-none absolute inset-0 bg-blue-950" style={{ opacity: dim / 100 }} />}
-        <p className="retro-hud mb-5 text-[8px] leading-6 tracking-wide sm:text-[10px]">— APP SELECT —</p>
+        <p className="retro-hud mb-5 text-[length:calc(.5rem*var(--text-scale))] leading-6 tracking-wide sm:text-[length:calc(.625rem*var(--text-scale))]">— APP SELECT —</p>
         <h1 aria-label="EmuHub" className="retro-title text-3xl sm:text-5xl md:text-6xl">
           {"EmuHub".split("").map((letter, i) => <span key={i} style={{ color: ["var(--retro-red)", "var(--retro-gold)", "#65c649", "#65c649", "var(--retro-red)", "var(--retro-gold)"][i], transform: `rotate(${i % 2 ? 2 : -2}deg)` }}>{letter}</span>)}
         </h1>
-        <p className="retro-hud mt-6 text-[10px] sm:text-xs">All your emulation apps One hub.</p>
+        <p className="retro-hud mt-6 text-[length:calc(.625rem*var(--text-scale))] sm:text-xs">All your emulation apps One hub.</p>
         <div className="mt-7 flex flex-wrap justify-center gap-4">
           <Button onClick={() => { setEditing(undefined); setShowAddForm(true); }} className="retro-button h-12 rounded-xl px-7"><Plus className="mr-2 h-5 w-5" /> Add App</Button>
           <Button asChild className="retro-button h-12 rounded-xl px-7"><Link to="/hub"><Monitor className="mr-2 h-5 w-5" />App Projection Hub</Link></Button>

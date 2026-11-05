@@ -68,6 +68,18 @@ export default {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      fontSize: {
+        xs: ["calc(0.75rem * var(--text-scale, 1))", { lineHeight: "1.4" }],
+        sm: ["calc(0.875rem * var(--text-scale, 1))", { lineHeight: "1.45" }],
+        base: ["calc(1rem * var(--text-scale, 1))", { lineHeight: "1.5" }],
+        lg: ["calc(1.125rem * var(--text-scale, 1))", { lineHeight: "1.55" }],
+        xl: ["calc(1.25rem * var(--text-scale, 1))", { lineHeight: "1.4" }],
+        "2xl": ["calc(1.5rem * var(--text-scale, 1))", { lineHeight: "1.35" }],
+        "3xl": ["calc(1.875rem * var(--text-scale, 1))", { lineHeight: "1.2" }],
+        "4xl": ["calc(2.25rem * var(--text-scale, 1))", { lineHeight: "1.15" }],
+        "5xl": ["calc(3rem * var(--text-scale, 1))", { lineHeight: "1.1" }],
+        "6xl": ["calc(3.75rem * var(--text-scale, 1))", { lineHeight: "1.1" }],
+      },
       keyframes: {
         "accordion-down": {
           from: {

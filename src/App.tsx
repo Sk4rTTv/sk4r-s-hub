@@ -6,11 +6,14 @@ import { BrowserRouter, HashRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import ProjectionHub from "./pages/ProjectionHub";
+import Settings from "./pages/Settings";
+import { InterfaceSettingsProvider } from "./contexts/InterfaceSettings";
 
 const queryClient = new QueryClient();
 const Router = window.emuDesktop ? HashRouter : BrowserRouter;
 
 const App = () => (
+  <InterfaceSettingsProvider>
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
@@ -19,6 +22,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />}>
             <Route path="hub" element={<ProjectionHub />} />
+            <Route path="settings" element={<Settings />} />
           </Route>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
@@ -26,6 +30,7 @@ const App = () => (
       </Router>
     </TooltipProvider>
   </QueryClientProvider>
+  </InterfaceSettingsProvider>
 );
 
 export default App;

@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Monitor, AppWindow, Square, ScreenShare, RefreshCw, ExternalLink } from "lucide-react";
+import { ArrowLeft, Monitor, AppWindow, Square, ScreenShare, RefreshCw, ExternalLink, Settings, Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useProjectionFps } from "@/hooks/useProjectionFps";
 import type { ProjectionSource } from "@/types/desktop";
 import "@/retro.css";
 
@@ -19,6 +20,7 @@ const ProjectionHub = () => {
   const [sourceName, setSourceName] = useState("");
   const stream = useRef<MediaStream | null>(null);
   const player = useRef<HTMLVideoElement>(null);
+  const { fps, available: fpsAvailable } = useProjectionFps(player, active);
   const mounted = useRef(true);
   const pending = useRef(false);
   const refreshing = useRef(false);
@@ -81,7 +83,10 @@ const ProjectionHub = () => {
     <div className="console-shell mx-auto max-w-6xl overflow-hidden rounded-3xl">
       <header className="console-header flex flex-wrap items-center justify-between gap-4 p-5 sm:px-7">
         <h1 className="retro-hud flex items-center gap-3 text-xs leading-6"><Monitor className="h-7 w-7 text-yellow-300" />Projection Hub</h1>
-        <Button asChild variant="outline" className="rounded-xl bg-blue-950 text-white hover:bg-blue-800 hover:text-white"><Link to="/"><ArrowLeft className="mr-2 h-4 w-4" />Back to title</Link></Button>
+        <div className="flex flex-wrap gap-3">
+          <Button asChild variant="outline" className="rounded-xl bg-blue-950 text-white hover:bg-blue-800 hover:text-white"><Link to="/settings"><Settings className="mr-2 h-4 w-4" />Settings</Link></Button>
+          <Button asChild variant="outline" className="rounded-xl bg-blue-950 text-white hover:bg-blue-800 hover:text-white"><Link to="/"><ArrowLeft className="mr-2 h-4 w-4" />Back to title</Link></Button>
+        </div>
       </header>
       <main className="space-y-5 p-4 sm:p-7">
         <div className="retro-toolbar flex flex-wrap items-end gap-4 rounded-2xl p-4">
@@ -101,8 +106,15 @@ const ProjectionHub = () => {
           <video ref={player} autoPlay muted playsInline aria-label="Live mirrored monitor or application" className={`h-full w-full object-contain ${active ? "" : "invisible"}`} />
           {!active && <div className="absolute inset-0 flex flex-col items-center justify-center gap-5 p-5 text-center">{type === "monitor" ? <Monitor className="h-16 w-16 text-indigo-300 sm:h-24 sm:w-24" /> : <AppWindow className="h-16 w-16 text-indigo-300 sm:h-24 sm:w-24" />}<h2 className="retro-hud text-xs leading-6">SELECT A SOURCE TO MIRROR</h2><p className="text-sm text-blue-100">Choose a monitor or running application above.</p></div>}
         </div>
-        <p role="status" className="flex items-center gap-2 text-sm text-blue-100"><span className={`h-2 w-2 shrink-0 rounded-full ${active ? "bg-green-400" : "bg-slate-400"}`} /><span className="break-all">{active ? `Mirroring · ${sourceName}` : "Not mirroring"}</span></p>
-        <p className="text-xs leading-5 text-blue-200">Display only—no recording, uploads, or remote input. Mirroring a monitor shows all its windows and notifications. Stop ends sharing, not the application.</p>
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <p role="status" className="flex min-w-0 items-center gap-2 text-sm text-blue-100"><span className={`h-2 w-2 shrink-0 rounded-full ${active ? "bg-green-400" : "bg-slate-400"}`} /><span className="break-all">{active ? `Mirroring · ${sourceName}` : "Not mirroring"}</span></p>
+          <div className="flex items-center gap-3 rounded-xl border-2 border-cyan-600 bg-blue-950 px-4 py-3" title="Displayed projection-video frames per second, not emulator FPS.">
+            <Activity className="h-5 w-5 text-cyan-300" />
+            <div><p className="text-xs text-blue-100">Projection FPS</p><p className="font-mono text-xl font-bold tabular-nums text-cyan-200">{!active ? "—" : !fpsAvailable ? "Unavailable" : fps === null ? "Measuring…" : `${fps} FPS`}</p></div>
+          </div>
+        </div>
+        <p className="text-xs leading-5 text-blue-200">FPS measures the mirrored video and updates every second; it is not the emulator’s internal FPS. Static windows may show a low rate.</p>
+        <p className="text-xs leading-5 text-blue-200">Display only—no recording, uploads, or remote input. Mirroring a monitor shows all its windows and notifications. Stop ends sharing, not the application. Opening Settings ends sharing; mirror again when you return.</p>
         {!desktop && <a href={window.location.href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded text-sm text-yellow-300 underline underline-offset-4"><ExternalLink className="h-4 w-4" />Open in a new tab if preview sharing is blocked</a>}
       </main>
     </div>

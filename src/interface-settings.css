@@ -1,0 +1,20 @@
+:root {
+  --text-scale: 1;
+  --gui-scale: 1;
+  font-size: calc(100% * var(--gui-scale));
+}
+body { font-size: calc(1rem * var(--text-scale)); }
+html[data-large-text='true'] :is(.retro-world, .retro-dialog) :is(button, a.inline-flex, [role='combobox']) {
+  height: auto;
+  min-height: 2.5rem;
+  padding-top: .5rem;
+  padding-bottom: .5rem;
+  white-space: normal;
+  line-height: 1.6;
+}
+.console-header button { font-size: calc(.5rem * var(--text-scale)) !important; }
+.retro-button { font-size: calc(.625rem * var(--text-scale)) !important; }
+.retro-toolbar input, .retro-toolbar [role='combobox'] { font-size: calc(.75rem * var(--text-scale)) !important; }
+.console-footer { font-size: calc(.5625rem * var(--text-scale)) !important; }
+.settings-range { width: 100%; min-height: 2.5rem; accent-color: var(--retro-gold); cursor: pointer; }
+.settings-range:focus-visible { outline: 2px solid var(--retro-gold); outline-offset: 4px; border-radius: .5rem; }
