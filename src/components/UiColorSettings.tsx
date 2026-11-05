@@ -1,6 +1,7 @@
-import { Check, Palette, RotateCcw } from "lucide-react";
+import { Palette, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { ThemePreset } from "@/components/ThemePreset";
 import { useInterfaceSettings } from "@/contexts/InterfaceSettings";
 import { uiThemes, type UiColors } from "@/lib/ui-colors";
 
@@ -18,12 +19,9 @@ export function UiColorSettings() {
       <h2 id="ui-colors-heading" className="flex items-center gap-3 text-lg font-bold"><Palette className="h-7 w-7 text-cyan-300" />UI colors</h2>
       <Button onClick={resetColors} variant="outline" className="rounded-xl border-indigo-300 bg-blue-950 text-white"><RotateCcw className="mr-2 h-4 w-4" />Reset colors</Button>
     </div>
-    <p className="text-sm leading-6 text-blue-100">Choose a theme or build your own palette. Text contrast adjusts automatically. Wallpaper, game covers, and emulator video keep their original colors.</p>
+    <p className="text-sm leading-6 text-blue-100">Hover over a theme or focus it with your keyboard to preview its panels and buttons; click to apply. You can also build your own palette below. Text contrast adjusts automatically. Wallpaper, game covers, and emulator video keep their original colors.</p>
     <div role="group" aria-label="Preset color themes" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-      {uiThemes.map(theme => <button key={theme.name} type="button" aria-pressed={selected?.name === theme.name} onClick={() => setColors(theme.colors)} className="theme-preset rounded-xl border-2 border-indigo-400 bg-blue-950 p-4 text-left">
-        <span className="mb-3 flex gap-2" aria-hidden="true">{colorFields.map(field => <span key={field.key} className="h-7 w-7 rounded-full border border-white/40" style={{ backgroundColor: theme.colors[field.key] }} />)}</span>
-        <span className="flex items-center justify-between gap-2 text-sm font-bold">{theme.name}{selected?.name === theme.name && <Check className="h-4 w-4 shrink-0" />}</span>
-      </button>)}
+      {uiThemes.map(theme => <ThemePreset key={theme.name} theme={theme} selected={selected?.name === theme.name} onSelect={() => setColors(theme.colors)} />)}
     </div>
     <p role="status" className="text-xs text-blue-200">Active palette: {selected?.name ?? "Custom colors"}</p>
     <div className="grid gap-4 md:grid-cols-3">
