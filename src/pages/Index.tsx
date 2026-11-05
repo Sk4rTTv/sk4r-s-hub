@@ -6,7 +6,6 @@ import { SAMPLE_APPS } from "@/data/apps";
 import { Plus, Star, Gamepad2, ImagePlus, Volume2, VolumeX, Pause, Play } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { RetroBackdrop } from "@/components/RetroBackdrop";
 import { useRetroSounds } from "@/hooks/useRetroSounds";
 import { toast } from "sonner";
 import "@/retro.css";
@@ -49,12 +48,14 @@ const Index = () => {
   const mediaError = () => { toast.error("This media could not be displayed. Try PNG, JPG, GIF, MP4, or WebM."); setBackground(null); };
 
   return (
-    <div className="retro-world relative min-h-screen overflow-x-hidden pb-24 text-white">
-      {background ? <div className="pointer-events-none fixed inset-0">
+    <div className="retro-world relative min-h-screen overflow-x-hidden px-2 py-3 text-white sm:p-6">
+      {background && <div className="pointer-events-none fixed inset-0">
         {background.type === "video" ? <video key={background.url} ref={video} src={background.url} muted loop playsInline autoPlay className="h-full w-full object-cover" onError={mediaError} /> : <img src={background.url} alt="" className="h-full w-full object-cover" onError={mediaError} />}
         <div className="absolute inset-0 bg-blue-950" style={{ opacity: dim / 100 }} />
-      </div> : <RetroBackdrop />}
-      <header className="relative z-10 mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-5 py-6 sm:px-8">
+      </div>}
+      <div className="console-shell relative mx-auto max-w-6xl overflow-hidden rounded-3xl">
+      <div aria-hidden="true" className="crt-lines pointer-events-none absolute inset-0 z-40" />
+      <header className="console-header relative z-10 mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-5 py-4 sm:px-8">
         <div className="flex items-center gap-3"><Gamepad2 className="h-8 w-8 text-[var(--retro-gold)]" /><span className="retro-hud text-xs">EmuHub</span></div>
         <div className="flex flex-wrap items-center gap-3">
           <div className="retro-hud mr-2 flex items-center gap-2 text-xs"><Star className="h-6 w-6 fill-[var(--retro-gold)] text-[var(--retro-gold)]" /><span>× {String(apps.length).padStart(2, "0")}</span></div>
@@ -63,15 +64,17 @@ const Index = () => {
           {background?.type === "video" && <Button variant="outline" aria-label={paused ? "Play background video" : "Pause background video"} onClick={() => setPaused(!paused)} className="rounded-xl border-blue-200 bg-blue-900 text-white hover:bg-blue-800 hover:text-white">{paused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}</Button>}
         </div>
       </header>
-      <section className="relative z-10 mx-auto max-w-6xl px-5 pb-8 pt-5 text-center sm:pt-8">
-        <p className="retro-hud mb-4 text-[8px] leading-6 tracking-wide sm:text-[10px]">YOUR NEXT ADVENTURE STARTS HERE</p>
+      <section className="console-hero relative z-10 mx-auto px-5 pb-10 pt-9 text-center sm:pb-12 sm:pt-12" style={background ? { backgroundImage: "none", backgroundColor: "transparent" } : undefined}>
+        <p className="retro-hud mb-5 text-[8px] leading-6 tracking-wide sm:text-[10px]">— GAME SELECT —</p>
         <h1 aria-label="EmuHub" className="retro-title text-3xl sm:text-5xl md:text-6xl">
-          {"EmuHub".split("").map((letter, i) => <span key={i} style={{ color: ["var(--retro-red)", "var(--retro-gold)", "#65c649", "#fff4d6", "var(--retro-red)", "var(--retro-gold)"][i] }}>{letter}</span>)}
+          {"EmuHub".split("").map((letter, i) => <span key={i} style={{ color: ["var(--retro-red)", "var(--retro-gold)", "#65c649", "#65c649", "var(--retro-red)", "var(--retro-gold)"][i], transform: `rotate(${i % 2 ? 2 : -2}deg)` }}>{letter}</span>)}
         </h1>
-        <p className="retro-hud mt-5 text-[10px] sm:text-xs">Pick a cartridge. Find an adventure.</p>
-        <Button onClick={() => { setEditing(undefined); setShowAddForm(true); }} className="retro-button mt-6 h-12 rounded-xl px-7"><Plus className="mr-2 h-5 w-5" /> Add Game</Button>
+        <p className="retro-hud mt-6 text-[10px] sm:text-xs">Choose your adventure.</p>
+        <Button onClick={() => { setEditing(undefined); setShowAddForm(true); }} className="retro-button mt-7 h-12 rounded-xl px-7"><Plus className="mr-2 h-5 w-5" /> Add Game</Button>
       </section>
-      <main className="relative z-10 mx-auto max-w-6xl p-4 sm:px-8"><EmulationAppList apps={apps} onEdit={handleEdit} onDelete={handleDelete} onPlay={handlePlay} onToggleFavorite={handleToggleFavorite} /></main>
+      <main className="console-library relative z-10 mx-auto max-w-6xl p-4 sm:p-7"><EmulationAppList apps={apps} onEdit={handleEdit} onDelete={handleDelete} onPlay={handlePlay} onToggleFavorite={handleToggleFavorite} /></main>
+      <footer className="console-footer relative z-10 flex flex-wrap items-center justify-center gap-6 px-4 py-5 text-xs"><span className="flex items-center gap-2"><Gamepad2 className="h-6 w-6 text-slate-300" /> Your collection</span><span className="flex items-center gap-2"><span className="console-key bg-green-400 text-green-950">A</span> Pick your adventure</span><span className="flex items-center gap-2"><Star className="h-5 w-5 fill-yellow-400 text-yellow-400" /> {apps.length} games</span></footer>
+      </div>
       {showAddForm && <AddEmulationApp app={editing} onAdd={handleSave} onClose={closeForm} upload={upload} />}
       {showSettings && <AppearanceSettings onClose={() => setShowSettings(false)} background={background} onBackground={setBackground} upload={upload} dim={dim} onDim={setDim} paused={paused} onPaused={setPaused} />}
     </div>

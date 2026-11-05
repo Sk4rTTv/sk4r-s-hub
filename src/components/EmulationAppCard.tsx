@@ -2,6 +2,7 @@ import { EmulationApp } from "../types/emulation";
 import { Star, MoreHorizontal, Play, Pencil, Trash2 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { PixelGameLabel } from "./PixelGameLabel";
 
 interface EmulationAppCardProps {
   app: EmulationApp;
@@ -12,14 +13,10 @@ interface EmulationAppCardProps {
 }
 
 export const EmulationAppCard = ({ app, onEdit, onDelete, onPlay, onToggleFavorite }: EmulationAppCardProps) => (
-  <article className="cartridge group relative flex min-w-0 flex-col rounded-xl" style={{ backgroundColor: app.color }}>
+  <article className="cartridge group relative flex min-w-0 flex-col rounded-xl" style={{ backgroundColor: `color-mix(in srgb, ${app.color} 14%, #a5a9bc)` }}>
     <div aria-hidden="true" className="cartridge-grip mx-auto mb-3 mt-1 h-4 w-2/3 rounded-sm" />
-    <div className="cartridge-label relative flex h-32 items-center justify-center overflow-hidden rounded-t-lg bg-[var(--retro-cream)] sm:h-36">
-      {app.artwork ? <img src={app.artwork} alt={`${app.name} cartridge artwork`} className="absolute inset-0 h-full w-full object-cover" /> : <>
-        <div aria-hidden="true" className="absolute -left-8 -top-8 h-32 w-32 rotate-12 rounded-3xl opacity-20" style={{ backgroundColor: app.color }} />
-        <div aria-hidden="true" className="absolute -bottom-12 -right-8 h-32 w-32 rotate-45 rounded-3xl opacity-20" style={{ backgroundColor: app.color }} />
-        <span className="retro-game-icon relative text-6xl transition-transform duration-200 motion-safe:group-hover:scale-110">{app.icon}</span>
-      </>}
+    <div className="cartridge-label cartridge-art relative flex h-32 items-center justify-center overflow-hidden rounded-t-lg sm:h-36">
+      {app.artwork ? <img src={app.artwork} alt={`${app.name} cartridge artwork`} className="absolute inset-0 h-full w-full object-cover" /> : <PixelGameLabel system={app.system} color={app.color} />}
       {app.status === "favorite" && <Star aria-label="Favorite" className="absolute left-3 top-3 h-6 w-6 fill-[var(--retro-gold)] text-amber-800" />}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>

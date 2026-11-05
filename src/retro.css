@@ -1,35 +1,50 @@
 @import '@fontsource/press-start-2p/400.css';
 
 :root {
-  --retro-sky: #367fd0;
-  --retro-blue: #214b96;
-  --retro-gold: #ffcf38;
-  --retro-red: #f25343;
-  --retro-cream: #fff0c4;
-  --retro-paper: #fffaf0;
-  --retro-wood: #76502c;
-  --retro-ink: #342920;
+  --retro-sky: #10143f;
+  --retro-blue: #151b58;
+  --retro-gold: #ffe347;
+  --retro-red: #f7473c;
+  --retro-cream: #adb3cb;
+  --retro-paper: #adb3cb;
+  --retro-wood: #313653;
+  --retro-ink: #171b31;
+  --console-edge: #6865b7;
 }
-.retro-world { background-color: var(--retro-sky); font-family: 'Trebuchet MS', Verdana, sans-serif; }
+.retro-world { background-color: #10143f; font-family: 'Trebuchet MS', Verdana, sans-serif; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'%3E%3Cg fill='none' stroke='%2322295b' stroke-width='1'%3E%3Cpath d='M0 12h24v24h24v36h48M12 96V60h12M60 0v24h24v24h12M0 84h48V60h24'/%3E%3Ccircle cx='24' cy='60' r='3'/%3E%3Ccircle cx='60' cy='24' r='3'/%3E%3Ccircle cx='72' cy='60' r='3'/%3E%3C/g%3E%3C/svg%3E"); }
+.console-shell { border: 3px solid #3d4387; background: #10143fea; box-shadow: inset 0 2px #8f99d3, inset 0 -3px #070c2c, 0 0 0 5px #141937, 0 14px 35px #060b2a; }
+.console-header { background: #181e5ee8; border-bottom: 3px solid #080d32; box-shadow: inset 0 -1px #6466aa; }
+.console-header button { border-color: #6868aa; background: #101740; box-shadow: inset 0 2px #363f7a, 0 3px #060a25; font-family: 'Press Start 2P', monospace; font-size: 8px; }
+.console-hero { background-color: #216cd3; background-image: url('/assets/retro-adventure.png'); background-size: cover; background-position: center 65%; image-rendering: pixelated; border-bottom: 3px solid #5d68b1; }
+.console-library { background: #111542e8; }
+.crt-lines { opacity: .13; border-radius: inherit; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Cpath d='M0 0h4v1H0Z' fill='%23000418'/%3E%3Cpath d='M0 2h4v1H0Z' fill='%23b6d8ff' fill-opacity='.15'/%3E%3C/svg%3E"); }
 .pixel-font, .retro-title, .retro-hud, .retro-button { font-family: 'Press Start 2P', monospace; }
 .retro-title { font-weight: 400; letter-spacing: -.08em; line-height: 1.5; }
-.retro-title span { display: inline-block; text-shadow: 3px 0 #623626, -2px 0 #623626, 0 -2px #623626, 0 3px #623626, 4px 6px #214b96; }
-.retro-hud { font-weight: 400; line-height: 1.8; text-shadow: 2px 2px 0 #17345f; }
-.retro-button { background: var(--retro-gold) !important; color: var(--retro-ink) !important; border: 3px solid #a76d21 !important; box-shadow: inset 0 3px 0 #fff2b0, 0 5px 0 #76502c; font-size: 10px; line-height: 1.6; transition: transform .15s, box-shadow .15s; }
-.retro-button:hover { background: #ffe27b !important; transform: translateY(-2px); }
-.retro-button:active { transform: translateY(3px); box-shadow: inset 0 3px 0 #fff2b0, 0 2px 0 #76502c; }
-.cartridge { padding: 10px 10px 0; border: 3px solid #334155; border-top-width: 7px; box-shadow: inset 4px 0 #ffffff40, inset -4px 0 #00000030, 0 7px #1e293b, 0 10px #173c7a60; transition: transform .2s, border-color .2s; }
-.cartridge:hover, .cartridge:focus-within { border-color: var(--retro-gold); transform: translateY(-4px); }
-.cartridge-grip { background: #334155; box-shadow: inset 0 2px #ffffff50, inset 0 5px #00000030, inset 0 7px #ffffff30, inset 0 10px #00000030, inset 0 12px #ffffff30; }
-.cartridge-label { border-left: 3px solid #334155; border-right: 3px solid #334155; }
-.cartridge-label:nth-of-type(2) { border-top: 3px solid #334155; }
-.cartridge-label:nth-of-type(3) { border-bottom: 3px solid #334155; }
-.cartridge-connector { position: relative; overflow: hidden; background: #1e293b; border: 3px solid #1e293b; border-bottom: 0; }
+.retro-title span { display: inline-block; -webkit-text-stroke: 1px #170e24; text-shadow: 2px 0 #170e24, -2px 0 #170e24, 0 -2px #170e24, 0 3px #170e24, 4px 5px #170e24, 6px 8px #080d32, 0 -3px #fff3; }
+.retro-hud { font-weight: 400; line-height: 1.8; text-shadow: 2px 2px 0 #070c28; }
+.console-hero .retro-hud { text-shadow: 2px 0 #080d32, -2px 0 #080d32, 0 -2px #080d32, 0 2px #080d32, 2px 3px #080d32; }
+.retro-button { background: var(--retro-gold) !important; color: #201807 !important; border: 3px solid #211c16 !important; box-shadow: inset 0 3px #fff9b7, inset -3px -3px #c7a21e, 0 4px #a4771d, 0 7px #101025; font-size: 10px; line-height: 1.6; transition: transform .15s, box-shadow .15s; }
+.retro-button:hover { background: #fff18a !important; transform: translateY(-2px); }
+.retro-button:active { transform: translateY(3px); box-shadow: inset 0 3px #fff9b7, 0 2px #101025; }
+.cartridge { padding: 10px 12px 0; border: 3px solid #444861; border-top: 7px solid #cbd0e0; border-radius: 26px 26px 12px 12px !important; box-shadow: inset 5px 0 #e3e5f0, inset -5px 0 #64697f, inset 0 -4px #656a7f, 0 6px #060b26, 0 9px #060b2660; transition: transform .16s, box-shadow .16s; }
+.cartridge:hover, .cartridge:focus-within { transform: translateY(-4px); box-shadow: inset 5px 0 #e3e5f0, inset -5px 0 #64697f, 0 0 0 3px var(--retro-gold), 0 0 16px 3px #ffe34780, 0 8px #060b26; }
+.cartridge-grip { background: #71778e; box-shadow: inset 0 2px #e3e5f0, inset 0 5px #484d65, inset 0 7px #bfc5da, inset 0 10px #484d65, inset 0 12px #bfc5da; }
+.cartridge-label { border-left: 3px solid #60667e; border-right: 3px solid #60667e; }
+.cartridge-art { border: 5px solid #646a82; border-top-color: #4d546d; border-bottom-color: #dde0ed; box-shadow: 0 0 0 1px #d7dcec; image-rendering: pixelated; margin: 0 9px; }
+.cartridge-label:nth-of-type(3) { background: transparent; border: 0; padding-left: 2px; padding-right: 2px; }
+.cartridge-label h3 { text-shadow: 0 1px #d2d7e8; }
+.cartridge-label p { color: #292f49; }
+.cartridge-connector { position: relative; overflow: hidden; background: #343950; border: 3px solid #343950; border-bottom: 0; }
 .cartridge-connector::before { content: ''; position: absolute; top: 2px; left: 5px; width: 5px; height: 14px; background: #d6b85a; box-shadow: 10px 0 #d6b85a, 20px 0 #d6b85a, 30px 0 #d6b85a, 40px 0 #d6b85a, 50px 0 #d6b85a, 60px 0 #d6b85a, 70px 0 #d6b85a, 80px 0 #d6b85a, 90px 0 #d6b85a, 100px 0 #d6b85a, 110px 0 #d6b85a, 120px 0 #d6b85a, 130px 0 #d6b85a, 140px 0 #d6b85a, 150px 0 #d6b85a; }
-.retro-game-icon { filter: drop-shadow(3px 5px 0 #76502c40); }
-.retro-menu { background: #fffaf0; color: #342920; border: 3px solid #76502c; font-family: 'Trebuchet MS', Verdana, sans-serif; }
-.retro-toolbar { background: var(--retro-blue); border: 3px solid #173c7a; box-shadow: inset 0 2px 0 #6c9ddd, 0 4px 0 #173c7a; }
-.retro-sort { background: #173c7a; border-color: #81a9df; }
-.retro-sort button:hover, .retro-sort button:focus-visible { background: #3566b0; color: white; }
-.retro-dialog { font-family: 'Trebuchet MS', Verdana, sans-serif; border: 5px solid #76502c; background: #fffaf0; color: #342920; box-shadow: 0 8px 0 #4d3521; }
+.retro-menu { background: #e4e6f1; color: #171b31; border: 3px solid #6865a4; font-family: 'Trebuchet MS', Verdana, sans-serif; box-shadow: 0 5px #080d32; }
+.retro-toolbar { background: #202064; border: 3px solid #6261ac; box-shadow: inset 0 2px #8888cf, inset 0 -3px #12163f, 0 4px #080d32; }
+.retro-toolbar input, .retro-toolbar [role='combobox'] { border: 2px solid #7471b5; background: #101337; color: white; border-radius: 9px; font-size: 12px; box-shadow: inset 2px 2px #060a23; }
+.retro-toolbar input::placeholder { color: #bfc6e8; }
+.retro-sort { background: #101337; border: 2px solid #7471b5; }
+.retro-sort button:hover, .retro-sort button:focus-visible { background: #454795; color: white; }
+.retro-sort button[aria-pressed='true'] { background: #ffe347; color: #201807; }
+.retro-dialog { font-family: 'Trebuchet MS', Verdana, sans-serif; border: 5px solid #6461a5; background: #e4e6f1; color: #171b31; box-shadow: inset 0 3px #c4c7ef, 0 8px #080d32; }
+.console-footer { border-top: 2px solid #525892; background: #0c1135; font-family: 'Press Start 2P', monospace; font-size: 9px; line-height: 1.8; box-shadow: inset 0 3px #20285d; }
+.console-key { display: inline-flex; align-items: center; justify-content: center; height: 26px; width: 26px; border-radius: 50%; border: 2px solid #091024; box-shadow: inset 2px 2px #ffffff80, 0 2px #000720; }
+@media (max-width: 480px) { .cartridge { padding-left: 6px; padding-right: 6px; } .cartridge-art { margin: 0 3px; } }
 @media (prefers-reduced-motion: reduce) { .cartridge, .retro-button { transition: none; transform: none !important; } }

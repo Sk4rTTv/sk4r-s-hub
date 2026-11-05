@@ -106,7 +106,7 @@ export const EmulationAppList = ({
 
   return (
       <div className="w-full">
-        <div className="retro-toolbar mb-8 flex flex-col gap-4 rounded-2xl p-4 xl:flex-row">
+        <div className="retro-toolbar mb-8 flex flex-col gap-3 rounded-2xl p-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white" />
             <Input
@@ -139,6 +139,7 @@ export const EmulationAppList = ({
                   key={column}
                   variant="ghost"
                   size="sm"
+                  aria-pressed={sortBy === column}
                   onClick={() => handleSortChange(column)}
                   className="text-white hover:text-white h-8 px-3 rounded-lg transition-colors"
                 >
@@ -178,7 +179,7 @@ export const EmulationAppList = ({
         </div>
       ) : (
         <div
-          className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4 sm:gap-6"
+          className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4 sm:gap-7"
           role="list"
           aria-label="Emulation apps"
         >
@@ -195,8 +196,8 @@ export const EmulationAppList = ({
         </div>
       )}
 
-      <div className="retro-hud mt-8 text-center text-sm text-white">
-        Showing {filteredApps.length} of {apps.length} games • Your adventure collection
+      <div className="retro-hud mt-8 text-center text-[8px] leading-5 text-white sm:text-[10px]">
+        Showing {filteredApps.length} of {apps.length} games
       </div>
     </div>
   );
