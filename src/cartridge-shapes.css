@@ -1,0 +1,36 @@
+.collection-card { box-shadow: inset 0 1px #7c85c0, 0 6px #080d2d; transition: border-color .2s, box-shadow .2s; }
+.collection-card:focus-within { border-color: var(--retro-gold); box-shadow: 0 0 0 1px var(--retro-gold), 0 7px #080d2d; }
+.cartridge-stage { --tilt-x: -4deg; --tilt-y: -7deg; position: relative; height: 18rem; margin-top: .75rem; }
+.cartridge-stage .cartridge-model {
+  position: absolute;
+  inset: 0 0 3rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0 !important;
+  background: transparent;
+  box-shadow: none;
+  transform-origin: 50% 95%;
+  transform: perspective(800px) translateY(var(--cartridge-insert)) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) scale(var(--cartridge-scale));
+  transition: transform .3s cubic-bezier(.22, .8, .3, 1);
+}
+.cartridge-sculpture { display: block; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(5px 9px 5px #070c2680); }
+.collection-card:focus-within .cartridge-stage { --cartridge-insert: 1.5rem; --cartridge-scale: .98; --slot-light: #70f0b1; }
+@media (hover: hover) {
+  .collection-card:hover { border-color: #8c9be3; box-shadow: inset 0 1px #a6b1ef, 0 8px #080d2d; }
+  .collection-card:hover .cartridge-stage { --cartridge-insert: 1.5rem; --cartridge-scale: .98; --slot-light: #70f0b1; }
+}
+.cartridge-stage .console-slot { left: 4%; right: 4%; }
+.shape-nes .console-slot::after { background: #9ca5b6; border-color: #5b667d; border-top-color: #d9dfe9; border-radius: .2rem .2rem .6rem .6rem; }
+.shape-snes .console-slot::after { background: #9c9bad; border-color: #625d85; border-top-color: #d9d6eb; border-radius: .75rem .75rem .6rem .6rem; }
+.shape-n64 .console-slot::after, .shape-genesis .console-slot::after { background: #3b465a; border-color: #202b40; border-top-color: #6e7d96; border-radius: 1.4rem 1.4rem .75rem .75rem; }
+.shape-gb .console-slot, .shape-ds .console-slot { left: 20%; right: 20%; }
+.shape-gba .console-slot::after { background: #655d94; border-top-color: #a59bd5; }
+.shape-hucard .console-slot::after { background: #d0d4cd; border-color: #79867e; border-top-color: #f3f4e8; }
+.shape-atari .console-slot::after { background: #746052; border-color: #433c40; border-top-color: #c3a386; }
+.shape-disc .console-slot::before { display: none; }
+.shape-disc .console-slot::after { inset: 1.6rem 15% 0; background: #556b8b; border-top-color: #9ab1d0; }
+.shape-disc .console-slot-light, .shape-disc .console-slot-vents { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  .collection-card, .cartridge-stage .cartridge-model { transition: none; }
+  .cartridge-stage .cartridge-model { transform: none !important; }
+}
