@@ -1,4 +1,6 @@
-.retro-world {
+@import '@fontsource/press-start-2p/400.css';
+
+:root {
   --retro-sky: #367fd0;
   --retro-blue: #214b96;
   --retro-gold: #ffcf38;
@@ -7,21 +9,27 @@
   --retro-paper: #fffaf0;
   --retro-wood: #76502c;
   --retro-ink: #342920;
-  background-color: var(--retro-sky);
-  font-family: 'Trebuchet MS', Verdana, sans-serif;
 }
-.retro-title { font-family: 'Arial Rounded MT Bold', 'Trebuchet MS', sans-serif; font-weight: 1000; letter-spacing: -.07em; line-height: 1.1; }
-.retro-title span { display: inline-block; -webkit-text-stroke: 2px #623626; text-shadow: 2px 3px 0 #623626, 4px 6px 0 #623626, 6px 9px 0 #214b96; }
-.retro-hud { font-weight: 900; text-shadow: 2px 2px 0 #214b96; }
-.retro-button { background: var(--retro-gold) !important; color: var(--retro-ink) !important; border: 3px solid #a76d21 !important; box-shadow: inset 0 3px 0 #fff2b0, 0 5px 0 #76502c; font-weight: 900; transition: transform .15s, box-shadow .15s; }
+.retro-world { background-color: var(--retro-sky); font-family: 'Trebuchet MS', Verdana, sans-serif; }
+.pixel-font, .retro-title, .retro-hud, .retro-button { font-family: 'Press Start 2P', monospace; }
+.retro-title { font-weight: 400; letter-spacing: -.08em; line-height: 1.5; }
+.retro-title span { display: inline-block; text-shadow: 3px 0 #623626, -2px 0 #623626, 0 -2px #623626, 0 3px #623626, 4px 6px #214b96; }
+.retro-hud { font-weight: 400; line-height: 1.8; text-shadow: 2px 2px 0 #17345f; }
+.retro-button { background: var(--retro-gold) !important; color: var(--retro-ink) !important; border: 3px solid #a76d21 !important; box-shadow: inset 0 3px 0 #fff2b0, 0 5px 0 #76502c; font-size: 10px; line-height: 1.6; transition: transform .15s, box-shadow .15s; }
 .retro-button:hover { background: #ffe27b !important; transform: translateY(-2px); }
 .retro-button:active { transform: translateY(3px); box-shadow: inset 0 3px 0 #fff2b0, 0 2px 0 #76502c; }
-.retro-card { border: 5px solid var(--retro-wood); box-shadow: inset 0 2px 0 #f0cd88, 0 6px 0 #4d3521, 0 9px 0 #245ca1; transition: transform .2s, border-color .2s; }
-.retro-card:hover, .retro-card:focus-within { border-color: #e7b133; transform: translateY(-4px); }
+.cartridge { padding: 10px 10px 0; border: 3px solid #334155; border-top-width: 7px; box-shadow: inset 4px 0 #ffffff40, inset -4px 0 #00000030, 0 7px #1e293b, 0 10px #173c7a60; transition: transform .2s, border-color .2s; }
+.cartridge:hover, .cartridge:focus-within { border-color: var(--retro-gold); transform: translateY(-4px); }
+.cartridge-grip { background: #334155; box-shadow: inset 0 2px #ffffff50, inset 0 5px #00000030, inset 0 7px #ffffff30, inset 0 10px #00000030, inset 0 12px #ffffff30; }
+.cartridge-label { border-left: 3px solid #334155; border-right: 3px solid #334155; }
+.cartridge-label:nth-of-type(2) { border-top: 3px solid #334155; }
+.cartridge-label:nth-of-type(3) { border-bottom: 3px solid #334155; }
+.cartridge-connector { position: relative; overflow: hidden; background: #1e293b; border: 3px solid #1e293b; border-bottom: 0; }
+.cartridge-connector::before { content: ''; position: absolute; top: 2px; left: 5px; width: 5px; height: 14px; background: #d6b85a; box-shadow: 10px 0 #d6b85a, 20px 0 #d6b85a, 30px 0 #d6b85a, 40px 0 #d6b85a, 50px 0 #d6b85a, 60px 0 #d6b85a, 70px 0 #d6b85a, 80px 0 #d6b85a, 90px 0 #d6b85a, 100px 0 #d6b85a, 110px 0 #d6b85a, 120px 0 #d6b85a, 130px 0 #d6b85a, 140px 0 #d6b85a, 150px 0 #d6b85a; }
 .retro-game-icon { filter: drop-shadow(3px 5px 0 #76502c40); }
 .retro-menu { background: #fffaf0; color: #342920; border: 3px solid #76502c; font-family: 'Trebuchet MS', Verdana, sans-serif; }
 .retro-toolbar { background: var(--retro-blue); border: 3px solid #173c7a; box-shadow: inset 0 2px 0 #6c9ddd, 0 4px 0 #173c7a; }
 .retro-sort { background: #173c7a; border-color: #81a9df; }
 .retro-sort button:hover, .retro-sort button:focus-visible { background: #3566b0; color: white; }
 .retro-dialog { font-family: 'Trebuchet MS', Verdana, sans-serif; border: 5px solid #76502c; background: #fffaf0; color: #342920; box-shadow: 0 8px 0 #4d3521; }
-@media (prefers-reduced-motion: reduce) { .retro-card, .retro-button { transition: none; transform: none !important; } }
+@media (prefers-reduced-motion: reduce) { .cartridge, .retro-button { transition: none; transform: none !important; } }

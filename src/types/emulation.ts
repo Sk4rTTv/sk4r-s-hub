@@ -4,6 +4,7 @@ export interface EmulationApp {
   system: string;
   icon: string;
   color: string;
+  artwork?: string;
   status: "installed" | "not-installed" | "favorite";
   lastPlayed?: string;
   playtimeHours?: number;

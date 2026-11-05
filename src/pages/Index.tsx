@@ -1,86 +1,80 @@
 import { EmulationAppList } from "@/components/EmulationAppList";
 import { AddEmulationApp } from "@/components/AddEmulationApp";
+import { AppearanceSettings, type BackgroundMedia } from "@/components/AppearanceSettings";
 import { EmulationApp } from "@/types/emulation";
 import { SAMPLE_APPS } from "@/data/apps";
-import { Plus, Star, Gamepad2 } from "lucide-react";
-import { useState } from "react";
+import { Plus, Star, Gamepad2, ImagePlus, Volume2, VolumeX, Pause, Play } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { RetroBackdrop } from "@/components/RetroBackdrop";
+import { useRetroSounds } from "@/hooks/useRetroSounds";
+import { toast } from "sonner";
 import "@/retro.css";
 
 const Index = () => {
   const [showAddForm, setShowAddForm] = useState(false);
+  const [editing, setEditing] = useState<EmulationApp>();
   const [apps, setApps] = useState<EmulationApp[]>(SAMPLE_APPS);
+  const [showSettings, setShowSettings] = useState(false);
+  const [background, setBackground] = useState<BackgroundMedia | null>(null);
+  const [dim, setDim] = useState(35);
+  const [paused, setPaused] = useState(false);
+  const video = useRef<HTMLVideoElement>(null);
+  const urls = useRef<string[]>([]);
+  const { enabled, setEnabled } = useRetroSounds();
 
-  const handleAddApp = (newApp: Omit<EmulationApp, "id">) => {
-    setApps((prev) => [...prev, { ...newApp, id: Date.now().toString() }]);
+  const upload = (file: File) => {
+    const url = URL.createObjectURL(file);
+    urls.current.push(url);
+    return url;
   };
+  useEffect(() => () => { urls.current.forEach(url => URL.revokeObjectURL(url)); }, []);
+  useEffect(() => {
+    const player = video.current;
+    if (!player) return;
+    if (paused) player.pause();
+    else void player.play().catch(() => { setPaused(true); });
+  }, [paused, background]);
 
-  const handleEdit = (app: EmulationApp) => {
-    // In a full app, this would open an edit form
-    alert(`Edit mode for ${app.name} - coming soon!`);
+  const handleSave = (data: Omit<EmulationApp, "id">) => {
+    setApps(prev => editing ? prev.map(app => app.id === editing.id ? { ...data, id: app.id } : app) : [...prev, { ...data, id: crypto.randomUUID() }]);
+    setShowAddForm(false); setEditing(undefined);
+    toast.success(editing ? "Cartridge updated!" : "Cartridge added!");
   };
-
-  const handleDelete = (id: string) => {
-    setApps((prev) => prev.filter((app) => app.id !== id));
-  };
-
-  const handlePlay = (app: EmulationApp) => {
-    alert(`Playing ${app.name} on ${app.system}!`);
-  };
-
-  const handleToggleFavorite = (app: EmulationApp) => {
-    setApps((prev) =>
-      prev.map((a) =>
-        a.id === app.id ? { ...a, status: a.status === "favorite" ? "installed" : "favorite" } : a
-      )
-    );
-  };
+  const handleEdit = (app: EmulationApp) => { setEditing(app); setShowAddForm(true); };
+  const handleDelete = (id: string) => setApps(prev => prev.filter(app => app.id !== id));
+  const handlePlay = (app: EmulationApp) => toast.info(`${app.name}: open this game in your emulator. This browser organizer cannot launch local emulator apps.`);
+  const handleToggleFavorite = (app: EmulationApp) => setApps(prev => prev.map(a => a.id === app.id ? { ...a, status: a.status === "favorite" ? "installed" : "favorite" } : a));
+  const closeForm = () => { setShowAddForm(false); setEditing(undefined); };
+  const mediaError = () => { toast.error("This media could not be displayed. Try PNG, JPG, GIF, MP4, or WebM."); setBackground(null); };
 
   return (
     <div className="retro-world relative min-h-screen overflow-x-hidden pb-24 text-white">
-      <RetroBackdrop />
+      {background ? <div className="pointer-events-none fixed inset-0">
+        {background.type === "video" ? <video key={background.url} ref={video} src={background.url} muted loop playsInline autoPlay className="h-full w-full object-cover" onError={mediaError} /> : <img src={background.url} alt="" className="h-full w-full object-cover" onError={mediaError} />}
+        <div className="absolute inset-0 bg-blue-950" style={{ opacity: dim / 100 }} />
+      </div> : <RetroBackdrop />}
       <header className="relative z-10 mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-5 py-6 sm:px-8">
-        <div className="flex items-center gap-3">
-          <Gamepad2 className="h-9 w-9 text-[var(--retro-gold)]" />
-          <span className="retro-hud text-lg">EmuHub 64</span>
-        </div>
-        <div className="retro-hud flex items-center gap-2 text-lg">
-          <Star className="h-7 w-7 fill-[var(--retro-gold)] text-[var(--retro-gold)]" />
-          <span>× {String(apps.length).padStart(2, "0")}</span>
-          <span className="ml-2 text-xs tracking-widest">GAMES</span>
+        <div className="flex items-center gap-3"><Gamepad2 className="h-8 w-8 text-[var(--retro-gold)]" /><span className="retro-hud text-xs">EmuHub</span></div>
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="retro-hud mr-2 flex items-center gap-2 text-xs"><Star className="h-6 w-6 fill-[var(--retro-gold)] text-[var(--retro-gold)]" /><span>× {String(apps.length).padStart(2, "0")}</span></div>
+          <Button variant="outline" onClick={() => setEnabled(!enabled)} aria-pressed={enabled} aria-label={enabled ? "Mute retro sounds" : "Enable retro sounds"} className="h-10 rounded-xl border-2 border-blue-200 bg-blue-900 text-white hover:bg-blue-800 hover:text-white">{enabled ? <Volume2 className="mr-2 h-4 w-4" /> : <VolumeX className="mr-2 h-4 w-4" />}Sound {enabled ? "on" : "off"}</Button>
+          <Button variant="outline" onClick={() => setShowSettings(true)} className="h-10 rounded-xl border-2 border-blue-200 bg-blue-900 text-white hover:bg-blue-800 hover:text-white"><ImagePlus className="mr-2 h-4 w-4" />Background</Button>
+          {background?.type === "video" && <Button variant="outline" aria-label={paused ? "Play background video" : "Pause background video"} onClick={() => setPaused(!paused)} className="rounded-xl border-blue-200 bg-blue-900 text-white hover:bg-blue-800 hover:text-white">{paused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}</Button>}
         </div>
       </header>
       <section className="relative z-10 mx-auto max-w-6xl px-5 pb-8 pt-5 text-center sm:pt-8">
-        <p className="retro-hud mb-4 text-xs tracking-[.25em]">YOUR NEXT ADVENTURE STARTS HERE</p>
-        <h1 aria-label="EmuHub" className="retro-title text-6xl sm:text-8xl">
-          {"EmuHub".split("").map((letter, i) => <span key={i} style={{ color: ["var(--retro-red)", "var(--retro-gold)", "#65c649", "#fff4d6", "var(--retro-red)", "var(--retro-gold)"][i], transform: `rotate(${i % 2 ? 4 : -4}deg)` }}>{letter}</span>)}
-          <span className="ml-3 text-4xl text-[var(--retro-gold)] sm:text-6xl">64</span>
+        <p className="retro-hud mb-4 text-[8px] leading-6 tracking-wide sm:text-[10px]">YOUR NEXT ADVENTURE STARTS HERE</p>
+        <h1 aria-label="EmuHub" className="retro-title text-3xl sm:text-5xl md:text-6xl">
+          {"EmuHub".split("").map((letter, i) => <span key={i} style={{ color: ["var(--retro-red)", "var(--retro-gold)", "#65c649", "#fff4d6", "var(--retro-red)", "var(--retro-gold)"][i] }}>{letter}</span>)}
         </h1>
-        <p className="retro-hud mt-5 text-lg">Choose your adventure.</p>
-        <Button onClick={() => setShowAddForm(true)} className="retro-button mt-6 h-12 rounded-xl px-7 text-base">
-          <Plus className="mr-2 h-5 w-5" /> Add Game
-        </Button>
+        <p className="retro-hud mt-5 text-[10px] sm:text-xs">Pick a cartridge. Find an adventure.</p>
+        <Button onClick={() => { setEditing(undefined); setShowAddForm(true); }} className="retro-button mt-6 h-12 rounded-xl px-7"><Plus className="mr-2 h-5 w-5" /> Add Game</Button>
       </section>
-      <main className="relative z-10 mx-auto max-w-6xl p-4 sm:px-8">
-        <EmulationAppList
-          apps={apps}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          onPlay={handlePlay}
-          onToggleFavorite={handleToggleFavorite}
-        />
-      </main>
-
-      {/* Add Form */}
-      {showAddForm && (
-        <AddEmulationApp
-          onAdd={handleAddApp}
-          onClose={() => setShowAddForm(false)}
-        />
-      )}
+      <main className="relative z-10 mx-auto max-w-6xl p-4 sm:px-8"><EmulationAppList apps={apps} onEdit={handleEdit} onDelete={handleDelete} onPlay={handlePlay} onToggleFavorite={handleToggleFavorite} /></main>
+      {showAddForm && <AddEmulationApp app={editing} onAdd={handleSave} onClose={closeForm} upload={upload} />}
+      {showSettings && <AppearanceSettings onClose={() => setShowSettings(false)} background={background} onBackground={setBackground} upload={upload} dim={dim} onDim={setDim} paused={paused} onPaused={setPaused} />}
     </div>
   );
 };
-
 export default Index;

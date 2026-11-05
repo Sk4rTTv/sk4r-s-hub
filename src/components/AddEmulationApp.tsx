@@ -1,219 +1,56 @@
-import { EmulationApp, SYSTEMS } from "../types/emulation";
-import { useState } from "react";
+import { EmulationApp, SYSTEMS } from "@/types/emulation";
+import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { Plus, X, Palette, Gamepad2 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { MediaUpload } from "./MediaUpload";
 
 interface AddEmulationAppProps {
+  app?: EmulationApp;
   onAdd: (app: Omit<EmulationApp, "id">) => void;
   onClose: () => void;
+  upload: (file: File) => string;
 }
 
-export const AddEmulationApp = ({ onAdd, onClose }: AddEmulationAppProps) => {
-  const [name, setName] = useState("");
-  const [system, setSystem] = useState("");
-  const [icon, setIcon] = useState("🎮");
-  const [color, setColor] = useState("#00A0E8");
-  const [status, setStatus] = useState<EmulationApp["status"]>("installed");
-  const [lastPlayed, setLastPlayed] = useState("");
-  const [playtimeHours, setPlaytimeHours] = useState("");
+export const AddEmulationApp = ({ app, onAdd, onClose, upload }: AddEmulationAppProps) => {
+  const [name, setName] = useState(app?.name ?? "");
+  const [system, setSystem] = useState(app?.system ?? "");
+  const [icon, setIcon] = useState(app?.icon ?? "🎮");
+  const [color, setColor] = useState(app?.color ?? "#64748b");
+  const [artwork, setArtwork] = useState(app?.artwork);
+  const [status, setStatus] = useState<EmulationApp["status"]>(app?.status ?? "installed");
+  const [lastPlayed, setLastPlayed] = useState(app?.lastPlayed ?? "");
+  const [playtimeHours, setPlaytimeHours] = useState(app?.playtimeHours?.toString() ?? "");
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (!name || !system) return;
-
-    onAdd({
-      name,
-      system,
-      icon,
-      color,
-      status,
-      lastPlayed: lastPlayed || undefined,
-      playtimeHours: playtimeHours ? parseInt(playtimeHours, 10) : undefined,
-    });
+    if (!name.trim() || !system) { setError("Enter a game name and choose a system."); return; }
+    onAdd({ name: name.trim(), system, icon: icon || "🎮", color, artwork, status, lastPlayed: lastPlayed || undefined, playtimeHours: playtimeHours ? Number(playtimeHours) : undefined });
   };
 
-  const presetColors = [
-    "#00A0E8",
-    "#FF5722",
-    "#FFB300",
-    "#9C27B0",
-    "#00BCD4",
-    "#F44336",
-    "#607D8B",
-    "#4CAF50",
-    "#795548",
-    "#E91E63",
-    "#3F51B5",
-    "#009688",
-  ];
-
-  return (
-      <div
-        className="fixed inset-0 z-50 flex items-center justify-center p-4"
-        onClick={(e) => {
-          if (e.target === e.currentTarget) onClose();
-        }}
-      >
-        <div
-          className="absolute inset-0 bg-blue-950/70 backdrop-blur-sm"
-          onClick={onClose}
-        />
-        <div className="retro-dialog relative max-h-[90dvh] w-full max-w-md overflow-y-auto rounded-3xl motion-safe:animate-in motion-safe:fade-in duration-200">
-          <div className="border-b-4 border-amber-900 bg-blue-800 p-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-white text-xl font-black flex items-center gap-2">
-                <Gamepad2 className="h-5 w-5" />
-                New Adventure
-              </h2>
-              <button
-                onClick={onClose}
-                className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors"
-              >
-                <X className="h-4 w-4 text-white" />
-              </button>
-            </div>
-          </div>
-  
-          <form onSubmit={handleSubmit} className="p-6 space-y-5">
-            <div className="space-y-2">
-              <Label className="text-gray-700 font-medium">Game Name</Label>
-              <Input
-                placeholder="e.g. Super Mario World"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="rounded-xl"
-              />
-            </div>
-  
-            <div className="space-y-2">
-              <Label className="text-gray-700 font-medium">System</Label>
-              <Select value={system} onValueChange={setSystem}>
-                <SelectTrigger className="rounded-xl">
-                  <SelectValue placeholder="Select system..." />
-                </SelectTrigger>
-                <SelectContent className="rounded-xl">
-                  {SYSTEMS.map((s) => (
-                    <SelectItem key={s} value={s}>
-                      {s}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-  
-            <div className="space-y-2">
-              <Label className="text-gray-700 font-medium">Icon</Label>
-              <Input
-                placeholder="🎮"
-                value={icon}
-                onChange={(e) => setIcon(e.target.value)}
-                className="rounded-xl text-2xl"
-              />
-            </div>
-  
-            <div className="space-y-2">
-              <Label className="text-gray-700 font-medium">Color Theme</Label>
-              <div className="flex flex-wrap gap-2">
-                {presetColors.map((c) => (
-                  <button
-                    key={c}
-                    type="button"
-                    onClick={() => setColor(c)}
-                    className={`w-8 h-8 rounded-full border-2 transition-all ${
-                      color === c ? "ring-2 ring-blue-500 scale-110" : "border-transparent hover:scale-105"
-                    }`}
-                    style={{ backgroundColor: c }}
-                  />
-                ))}
-                <button
-                  type="button"
-                  onClick={() => {
-                    const input = document.createElement("input");
-                    input.type = "color";
-                    input.value = color;
-                    input.onchange = (e) => setColor((e.target as HTMLInputElement).value);
-                    input.click();
-                  }}
-                  className="w-8 h-8 rounded-full border-2 border-transparent hover:scale-105 transition-all flex items-center justify-center"
-                  title="Custom color"
-                >
-                  <Palette className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
-  
-            <div className="space-y-2">
-              <Label className="text-gray-700 font-medium">Status</Label>
-              <div className="flex gap-2">
-                {["installed", "not-installed", "favorite"].map((s) => (
-                  <button
-                    key={s}
-                    type="button"
-                    onClick={() => setStatus(s as EmulationApp["status"])}
-                    className={`flex-1 py-2 rounded-xl text-sm font-bold transition-colors ${
-                      status === s
-                        ? "border-2 border-amber-700 bg-amber-300 text-amber-950"
-                        : "border-2 border-amber-200 bg-amber-50 text-amber-900 hover:bg-amber-100"
-                    }`}
-                  >
-                    {s.charAt(0).toUpperCase() + s.slice(1).replace("-", " ")}
-                  </button>
-                ))}
-              </div>
-            </div>
-  
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label className="text-gray-700 font-medium">Last Played</Label>
-                <Input
-                  type="text"
-                  placeholder="e.g. 2 hours ago"
-                  value={lastPlayed}
-                  onChange={(e) => setLastPlayed(e.target.value)}
-                  className="rounded-xl"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-gray-700 font-medium">Playtime (hours)</Label>
-                <Input
-                  type="number"
-                  placeholder="0"
-                  value={playtimeHours}
-                  onChange={(e) => setPlaytimeHours(e.target.value)}
-                  className="rounded-xl"
-                />
-              </div>
-            </div>
-  
-            <div className="pt-4 flex justify-end gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onClose}
-                className="rounded-xl"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                className="retro-button rounded-xl"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add Game
-              </Button>
-            </div>
-          </form>
+  return <Dialog open onOpenChange={open => { if (!open) onClose(); }}>
+    <DialogContent className="retro-dialog max-h-[90dvh] w-[calc(100%_-_2rem)] max-w-lg overflow-y-auto rounded-2xl p-6">
+      <DialogHeader>
+        <DialogTitle className="pixel-font pr-6 text-sm leading-6">{app ? "Edit cartridge" : "New cartridge"}</DialogTitle>
+        <DialogDescription className="text-amber-900">Customize your game label and cartridge shell.</DialogDescription>
+      </DialogHeader>
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="space-y-2"><Label htmlFor="game-name">Game name</Label><Input id="game-name" required maxLength={120} value={name} onChange={e => setName(e.target.value)} className="rounded-xl bg-white" placeholder="Super Mario World" /></div>
+        <div className="space-y-2"><Label htmlFor="game-system">System</Label><Select value={system} onValueChange={setSystem}><SelectTrigger id="game-system" className="rounded-xl bg-white"><SelectValue placeholder="Select system" /></SelectTrigger><SelectContent className="retro-menu rounded-xl">{Array.from(new Set([...SYSTEMS, ...(system ? [system] : [])])).map(s => <SelectItem key={s} value={s} className="rounded-lg focus:bg-amber-100 focus:text-amber-950">{s}</SelectItem>)}</SelectContent></Select></div>
+        <MediaUpload label="Cartridge artwork" onSelect={file => setArtwork(upload(file))} />
+        {artwork && <div className="space-y-2"><img src={artwork} alt="Cartridge label preview" className="h-36 w-full rounded-xl border-4 border-slate-500 bg-slate-100 object-cover" onError={() => setError("This image format could not be displayed. Try PNG, JPG, WebP, or GIF.")} /><Button type="button" variant="outline" className="rounded-lg bg-white text-red-700 hover:bg-red-50" onClick={() => setArtwork(undefined)}>Remove artwork</Button></div>}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2"><Label htmlFor="game-icon">Fallback icon</Label><Input id="game-icon" value={icon} maxLength={20} onChange={e => setIcon(e.target.value)} className="rounded-xl bg-white text-xl" /></div>
+          <div className="space-y-2"><Label htmlFor="game-color">Shell color</Label><Input id="game-color" type="color" value={color} onChange={e => setColor(e.target.value)} className="h-10 rounded-xl bg-white p-1" /></div>
         </div>
-      </div>
-    );
-  };
+        <div className="space-y-2"><Label htmlFor="game-status">Status</Label><Select value={status} onValueChange={value => setStatus(value as EmulationApp["status"])}><SelectTrigger id="game-status" className="rounded-xl bg-white"><SelectValue /></SelectTrigger><SelectContent className="retro-menu rounded-xl"><SelectItem value="installed">Installed</SelectItem><SelectItem value="not-installed">Not installed</SelectItem><SelectItem value="favorite">Favorite</SelectItem></SelectContent></Select></div>
+        <div className="grid grid-cols-2 gap-4"><div className="space-y-2"><Label htmlFor="game-last">Last played</Label><Input id="game-last" value={lastPlayed} onChange={e => setLastPlayed(e.target.value)} placeholder="2 hours ago" className="rounded-xl bg-white" /></div><div className="space-y-2"><Label htmlFor="game-hours">Hours played</Label><Input id="game-hours" type="number" min="0" step="0.1" value={playtimeHours} onChange={e => setPlaytimeHours(e.target.value)} className="rounded-xl bg-white" /></div></div>
+        {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
+        <div className="flex justify-end gap-3 pb-2"><Button type="button" variant="outline" className="rounded-xl bg-white" onClick={onClose}>Cancel</Button><Button type="submit" className="retro-button rounded-xl">{app ? "Save changes" : "Add game"}</Button></div>
+      </form>
+    </DialogContent>
+  </Dialog>;
+};
