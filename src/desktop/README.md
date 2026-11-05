@@ -13,10 +13,11 @@ Windows packaging requires a suitable desktop build environment. The normal Vite
 
 1. Install or extract the Windows Dolphin emulator separately, keeping its supporting files together.
 2. In EmuHub desktop, Add App → Choose installed app (.exe) → select Dolphin.exe → Add app. Artwork is configured separately on the cartridge.
-3. Open App Projection Hub, choose the Dolphin entry, click Launch emulator, and confirm the native launch prompt.
-4. Dolphin opens in its own window. To mirror its display, click Project app window and explicitly select its window.
+3. Click Launch app on Dolphin's cartridge and confirm the native launch prompt.
+4. Open Projection Hub, choose Application window, choose Dolphin's running window from the source dropdown, and click Mirror. Confirm the source before sharing. Refresh lists newly opened windows.
+5. To mirror an entire display instead, choose Monitor and then the desired monitor. All visible windows and notifications on that monitor will be shown.
 
-Launching does not embed Dolphin, load a game automatically, or route controller/keyboard input through EmuHub. Use Dolphin's own UI. Stop projection stops sharing, not Dolphin. APK files require an Android emulator and are not executable targets for this launcher.
+Launching does not embed Dolphin, load a game automatically, or route controller/keyboard input through EmuHub. Use Dolphin's own UI. Stop ends sharing, not Dolphin. APK files require an Android emulator and are not executable targets for this launcher. In browser mode, monitor/window enumeration is private and the browser permission picker chooses the actual source.
 
 ## Security and lifetime
 

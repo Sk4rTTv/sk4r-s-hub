@@ -7,6 +7,8 @@ const { spawn } = require('node:child_process');
 
 let window;
 const executables = new Map();
+const projectionSources = new Map();
+let selectedProjection = null;
 const indexFile = path.resolve(__dirname, '../../dist/index.html');
 const indexUrl = pathToFileURL(indexFile).href;
 
@@ -50,6 +52,25 @@ ipcMain.handle('emuhub:launch-executable', async (event, id) => {
   return { launched: true };
 });
 
+ipcMain.handle('emuhub:list-projection-sources', async event => {
+  authorize(event);
+  const sources = await desktopCapturer.getSources({ types: ['screen', 'window'], thumbnailSize: { width: 0, height: 0 } });
+  projectionSources.clear();
+  return sources.filter(source => source.name !== 'EmuHub').map(source => {
+    const id = randomUUID();
+    const type = source.id.startsWith('screen:') ? 'monitor' : 'application';
+    const name = type === 'monitor' ? source.name.replace(/^Screen/i, 'Monitor') : source.name;
+    projectionSources.set(id, { sourceId: source.id, name, type });
+    return { id, name, type };
+  });
+});
+
+ipcMain.handle('emuhub:select-projection-source', (event, id) => {
+  authorize(event);
+  if (typeof id !== 'string' || !projectionSources.has(id)) throw new Error('Refresh the source list and select an available monitor or application.');
+  selectedProjection = { ...projectionSources.get(id), expires: Date.now() + 30000 };
+});
+
 function createWindow() {
   window = new BrowserWindow({ width: 1280, height: 900, minWidth: 680, minHeight: 500, title: 'EmuHub', backgroundColor: '#10143f', autoHideMenuBar: true, webPreferences: { preload: path.join(__dirname, 'preload.cjs'), nodeIntegration: false, contextIsolation: true, sandbox: true, webSecurity: true } });
   const session = window.webContents.session;
@@ -60,11 +81,15 @@ function createWindow() {
   session.setDisplayMediaRequestHandler(async (request, callback) => {
     try {
       if (!trustedFrame(request.frame) || !request.userGesture) { callback({}); return; }
-      const sources = (await desktopCapturer.getSources({ types: ['window'], thumbnailSize: { width: 0, height: 0 } })).filter(source => source.name !== 'EmuHub');
-      if (!sources.length) { callback({}); return; }
-      const choice = await dialog.showMessageBox(window, { title: 'Choose emulator window to project', message: 'Select only the app window you want to display.', buttons: ['Cancel', ...sources.map(source => source.name)], defaultId: 0, cancelId: 0, noLink: true });
-      if (!choice.response || !trustedFrame(request.frame)) { callback({}); return; }
-      callback({ video: sources[choice.response - 1] });
+      const target = selectedProjection;
+      selectedProjection = null;
+      if (!target || target.expires < Date.now()) { callback({}); return; }
+      const sources = await desktopCapturer.getSources({ types: [target.type === 'monitor' ? 'screen' : 'window'], thumbnailSize: { width: 0, height: 0 } });
+      const source = sources.find(entry => entry.id === target.sourceId);
+      if (!source) { callback({}); return; }
+      const choice = await dialog.showMessageBox(window, { title: 'Confirm mirroring', message: `Mirror ${source.name}?`, detail: target.type === 'monitor' ? 'The entire monitor will be visible, including other windows and notifications. No recording or upload takes place.' : 'Only this application window will be mirrored. No recording or upload takes place.', buttons: ['Cancel', 'Mirror'], defaultId: 0, cancelId: 0, noLink: true });
+      if (choice.response !== 1 || !trustedFrame(request.frame)) { callback({}); return; }
+      callback({ video: source });
     } catch { callback({}); }
   });
   window.webContents.setWindowOpenHandler(({ url }) => {
