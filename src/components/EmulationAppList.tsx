@@ -124,10 +124,10 @@ export const EmulationAppList = ({
               <SelectTrigger className="w-[180px] bg-white/10 border-white/20 text-white focus:border-blue-400 focus:ring-blue-400/30">
                 <SelectValue placeholder="All Systems" />
               </SelectTrigger>
-              <SelectContent className="bg-gray-900 border-gray-700">
-                <SelectItem value="all">All Systems</SelectItem>
+              <SelectContent className="rounded-xl bg-gray-900 border-gray-700 text-white">
+                <SelectItem value="all" className="rounded-lg text-white focus:bg-blue-700 focus:text-white">All Systems</SelectItem>
                 {systemsWithApps.map((system) => (
-                  <SelectItem key={system} value={system}>
+                  <SelectItem key={system} value={system} className="rounded-lg text-white focus:bg-blue-700 focus:text-white">
                     {system}
                   </SelectItem>
                 ))}
