@@ -105,70 +105,71 @@ export const EmulationAppList = ({
   };
 
   return (
-    <div className="w-full">
-      <div className="flex flex-col sm:flex-row gap-4 mb-6 p-4 rounded-2xl" style={{ background: "linear-gradient(135deg, rgba(0, 160, 232, 0.15), rgba(0, 160, 232, 0.05))", border: "1px solid rgba(0, 160, 232, 0.2)" }}>
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/50" />
-          <Input
-            type="text"
-            placeholder="Search games..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 bg-white/5 border-white/10 text-white placeholder-white/40 focus:border-blue-400/50 focus:ring-blue-400/20"
-          />
-        </div>
-
-        <div className="flex flex-wrap items-center gap-3">
-          <Select value={selectedSystem} onValueChange={setSelectedSystem}>
-            <SelectTrigger className="w-[180px] bg-white/5 border-white/10 text-white data-[placeholder]:text-white/40 focus:border-blue-400/50 focus:ring-blue-400/20">
-              <SelectValue placeholder="All Systems" />
-            </SelectTrigger>
-            <SelectContent className="bg-gray-900 border-gray-700">
-              <SelectItem value="all">All Systems</SelectItem>
-              {systemsWithApps.map((system) => (
-                <SelectItem key={system} value={system}>
-                  {system}
-                </SelectItem>
+      <div className="w-full">
+        <div className="flex flex-col sm:flex-row gap-4 mb-6 p-4 rounded-2xl relative overflow-hidden" style={{ background: "linear-gradient(135deg, rgba(0, 160, 232, 0.15), rgba(0, 160, 232, 0.05))", border: "1px solid rgba(0, 160, 232, 0.2)" }}>
+          <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 via-transparent to-blue-500/10" />
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/50" />
+            <Input
+              type="text"
+              placeholder="Search games..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 bg-white/5 border-white/10 text-white placeholder-white/40 focus:border-blue-400/50 focus:ring-blue-400/20"
+            />
+          </div>
+  
+          <div className="flex flex-wrap items-center gap-3 relative">
+            <Select value={selectedSystem} onValueChange={setSelectedSystem}>
+              <SelectTrigger className="w-[180px] bg-white/5 border-white/10 text-white data-[placeholder]:text-white/40 focus:border-blue-400/50 focus:ring-blue-400/20">
+                <SelectValue placeholder="All Systems" />
+              </SelectTrigger>
+              <SelectContent className="bg-gray-900 border-gray-700">
+                <SelectItem value="all">All Systems</SelectItem>
+                {systemsWithApps.map((system) => (
+                  <SelectItem key={system} value={system}>
+                    {system}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+  
+            <div className="flex items-center gap-1 border border-white/10 rounded-xl bg-white/5 p-1">
+              {(["name", "system", "lastPlayed", "playtime"] as const).map((column) => (
+                <Button
+                  key={column}
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleSortChange(column)}
+                  className="text-white/70 hover:text-white h-8 px-3 rounded-lg transition-colors"
+                >
+                  <span className="flex items-center gap-1 text-xs">
+                    {column === "name" && "Name"}
+                    {column === "system" && "System"}
+                    {column === "lastPlayed" && "Last Played"}
+                    {column === "playtime" && "Playtime"}
+                    {getSortIcon(column)}
+                  </span>
+                </Button>
               ))}
-            </SelectContent>
-          </Select>
-
-          <div className="flex items-center gap-1 border border-white/10 rounded-xl bg-white/5 p-1">
-            {(["name", "system", "lastPlayed", "playtime"] as const).map((column) => (
+            </div>
+  
+            {(searchQuery || selectedSystem !== "all") && (
               <Button
-                key={column}
                 variant="ghost"
                 size="sm"
-                onClick={() => handleSortChange(column)}
-                className="text-white/70 hover:text-white h-8 px-3 rounded-lg transition-colors"
+                onClick={() => {
+                  setSearchQuery("");
+                  setSelectedSystem("all");
+                }}
+                className="text-white/70 hover:text-white h-8 px-3 rounded-lg"
               >
-                <span className="flex items-center gap-1 text-xs">
-                  {column === "name" && "Name"}
-                  {column === "system" && "System"}
-                  {column === "lastPlayed" && "Last Played"}
-                  {column === "playtime" && "Playtime"}
-                  {getSortIcon(column)}
-                </span>
+                <X className="h-4 w-4 mr-1" />
+                Clear
               </Button>
-            ))}
+            )}
           </div>
-
-          {(searchQuery || selectedSystem !== "all") && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                setSearchQuery("");
-                setSelectedSystem("all");
-              }}
-              className="text-white/70 hover:text-white h-8 px-3 rounded-lg"
-            >
-              <X className="h-4 w-4 mr-1" />
-              Clear
-            </Button>
-          )}
         </div>
-      </div>
 
       {filteredApps.length === 0 ? (
         <div className="text-center py-16">

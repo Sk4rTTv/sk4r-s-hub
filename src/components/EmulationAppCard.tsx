@@ -70,13 +70,18 @@ export const EmulationAppCard = ({
         <div className="absolute inset-0 rounded-2xl p-4 flex flex-col">
           <div className="flex items-start justify-between mb-2">
             <div
-              className="w-16 h-16 rounded-xl flex items-center justify-center text-4xl transition-transform duration-300 group-hover:scale-110"
+              className="w-16 h-16 rounded-xl flex items-center justify-center text-4xl transition-transform duration-300 group-hover:scale-110 relative"
               style={{
                 background: `linear-gradient(135deg, ${app.color}33, ${app.color}11)`,
                 boxShadow: `inset 0 2px 4px ${app.color}20, 0 4px 8px ${app.color}10`,
               }}
             >
               <span>{app.icon}</span>
+              {isHovered && (
+                <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-br from-blue-400 to-purple-600 rounded-full flex items-center justify-center animate-pulse">
+                  <span className="text-xs">🎯</span>
+                </div>
+              )}
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
