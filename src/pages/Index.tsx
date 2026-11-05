@@ -6,6 +6,7 @@ import { GameEditor } from "@/components/GameEditor";
 import { GameCoverMenu } from "@/components/GameCoverMenu";
 import { CartridgeArtwork } from "@/components/CartridgeArtwork";
 import { StartMenu } from "@/components/StartMenu";
+import { WebsiteMenu } from "@/components/WebsiteMenu";
 import { AppearanceSettings, type BackgroundMedia } from "@/components/AppearanceSettings";
 import { EmulationApp } from "@/types/emulation";
 import type { LibraryGame } from "@/types/game";
@@ -144,6 +145,7 @@ const Index = () => {
         <div className="flex items-center gap-3"><Gamepad2 className="h-8 w-8 text-[var(--retro-gold)]" /><span className="retro-hud text-xs">EmuHub</span></div>
         <div className="flex flex-wrap items-center gap-3">
           {started && <Button variant="outline" onClick={() => { setStarted(false); window.scrollTo({ top: 0, behavior: "instant" }); }} className="h-10 rounded-xl border-2 border-blue-200 bg-blue-900 text-white"><ArrowLeft className="mr-2 h-4 w-4" />Start menu</Button>}
+          <WebsiteMenu />
           <div className="retro-hud mr-2 flex items-center gap-2 text-xs" aria-label={`${apps.length} apps and ${games.length} games`}><Star className="h-6 w-6 fill-[var(--retro-gold)] text-[var(--retro-gold)]" /><span>× {String(apps.length + games.length).padStart(2, "0")}</span></div>
           <Button variant="outline" onClick={() => setEnabled(!enabled)} aria-pressed={enabled} aria-label={enabled ? "Mute retro sounds" : "Enable retro sounds"} className="h-10 rounded-xl border-2 border-blue-200 bg-blue-900 text-white hover:bg-blue-800 hover:text-white">{enabled ? <Volume2 className="mr-2 h-4 w-4" /> : <VolumeX className="mr-2 h-4 w-4" />}Sound {enabled ? "on" : "off"}</Button>
           <Button variant="outline" onClick={() => setShowSettings(true)} className="h-10 rounded-xl border-2 border-blue-200 bg-blue-900 text-white hover:bg-blue-800 hover:text-white"><ImagePlus className="mr-2 h-4 w-4" />Background</Button>
