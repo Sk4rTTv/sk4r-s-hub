@@ -67,7 +67,7 @@ const Index = () => {
   const [paused, setPaused] = useState(false);
   const video = useRef<HTMLVideoElement>(null);
   const urls = useRef<string[]>([]);
-  const { enabled, setEnabled } = useRetroSounds();
+  const { enabled, setEnabled, playLaunchChime } = useRetroSounds();
   const inHub = ["/hub", "/settings", "/websites"].includes(useLocation().pathname.replace(/\/$/, ""));
   const [sceneId, setSceneId] = useState(retroScenes[0].id);
   const [shuffle, setShuffle] = useState(false);
@@ -147,7 +147,10 @@ const Index = () => {
       if (!executable) return;
       if (!app.nativeExecutable) setApps(prev => prev.map(entry => entry.id === app.id ? { ...entry, nativeExecutable: executable } : entry));
       const result = await desktop.launchExecutable(executable.id);
-      if (result.launched) toast.success(`${app.name} started in its own Windows window.`);
+      if (result.launched) {
+        playLaunchChime();
+        toast.success(`${app.name} started in its own Windows window.`);
+      }
     } catch {
       toast.error("Could not start this app. Use Edit app to select its installed .exe again, and check that its supporting files are present.");
     } finally {
@@ -176,7 +179,7 @@ const Index = () => {
           <WebsiteMenu />
           <Button variant="outline" onClick={() => setShowScanner(true)} className="h-10 rounded-xl border-2 border-blue-200 bg-blue-900 text-white"><FolderSearch className="mr-2 h-4 w-4" />Scanner{scanner.folders.length > 0 && ` (${scanner.folders.length})`}</Button>
           <div className="retro-hud mr-2 flex items-center gap-2 text-xs" aria-label={`${apps.length} apps and ${games.length} games`}><Star className="h-6 w-6 fill-[var(--retro-gold)] text-[var(--retro-gold)]" /><span>× {String(apps.length + games.length).padStart(2, "0")}</span></div>
-          <Button variant="outline" onClick={() => setEnabled(!enabled)} aria-pressed={enabled} aria-label={enabled ? "Mute retro sounds" : "Enable retro sounds"} className="h-10 rounded-xl border-2 border-blue-200 bg-blue-900 text-white hover:bg-blue-800 hover:text-white">{enabled ? <Volume2 className="mr-2 h-4 w-4" /> : <VolumeX className="mr-2 h-4 w-4" />}Sound {enabled ? "on" : "off"}</Button>
+          <Button data-retro-sound-toggle variant="outline" onClick={() => setEnabled(!enabled)} aria-pressed={enabled} aria-label={enabled ? "Mute retro sounds" : "Enable retro sounds"} className="h-10 rounded-xl border-2 border-blue-200 bg-blue-900 text-white hover:bg-blue-800 hover:text-white">{enabled ? <Volume2 className="mr-2 h-4 w-4" /> : <VolumeX className="mr-2 h-4 w-4" />}Sound {enabled ? "on" : "off"}</Button>
           <Button variant="outline" onClick={() => setShowSettings(true)} className="h-10 rounded-xl border-2 border-blue-200 bg-blue-900 text-white hover:bg-blue-800 hover:text-white"><ImagePlus className="mr-2 h-4 w-4" />Background</Button>
           <Button asChild variant="outline" className="h-10 rounded-xl border-2 border-blue-200 bg-blue-900 text-white hover:bg-blue-800 hover:text-white"><Link to="/settings"><Settings className="mr-2 h-4 w-4" />Settings</Link></Button>
           {background?.type === "video" && <Button variant="outline" aria-label={paused ? "Play background video" : "Pause background video"} onClick={() => setPaused(!paused)} className="rounded-xl border-blue-200 bg-blue-900 text-white hover:bg-blue-800 hover:text-white">{paused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}</Button>}

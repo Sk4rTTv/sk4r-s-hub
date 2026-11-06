@@ -43,8 +43,9 @@ export function ControllerProvider({ children }: { children: ReactNode }) {
       if (!element) return;
       markFocus(element);
     }
-    if (editable(element)) { setTarget(element); return; }
+    if (editable(element)) { window.dispatchEvent(new Event("emuhub:controller-press")); setTarget(element); return; }
     if (element instanceof HTMLSelectElement) {
+      window.dispatchEvent(new Event("emuhub:controller-press"));
       selectMode.current = selectMode.current === element ? null : element;
       setHint(selectMode.current ? "D-pad choose option · A or B finish" : defaultHint);
       return;
@@ -55,6 +56,7 @@ export function ControllerProvider({ children }: { children: ReactNode }) {
     } else if (!keyboardEvent(element, space ? " " : "Enter")) element.click();
   };
   const back = () => {
+    window.dispatchEvent(new Event("emuhub:controller-press"));
     if (selectMode.current) { selectMode.current = null; setHint(defaultHint); return; }
     const scope = controllerScope();
     if (scope !== document.body) {
@@ -65,6 +67,7 @@ export function ControllerProvider({ children }: { children: ReactNode }) {
     else window.dispatchEvent(new Event("emuhub:controller-back"));
   };
   const settings = () => {
+    window.dispatchEvent(new Event("emuhub:controller-press"));
     if (target) { setHint("Apply or cancel your text before opening Settings."); return; }
     const scope = controllerScope();
     if (scope !== document.body) keyboardEvent(document.activeElement instanceof HTMLElement ? document.activeElement : scope, "Escape");
