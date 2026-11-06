@@ -17,6 +17,8 @@ contextBridge.exposeInMainWorld('emuDesktop', {
   selectAppDirectory: () => ipcRenderer.invoke('emuhub:select-app-directory'),
   selectGameDirectory: () => ipcRenderer.invoke('emuhub:select-game-directory'),
   launchExecutable: id => ipcRenderer.invoke('emuhub:launch-executable', id),
+  onLaunchTransition: callback => controllerSubscription('emuhub:launch-transition', callback),
+  completeLaunchTransition: (token, ready) => ipcRenderer.invoke('emuhub:complete-launch-transition', token, ready),
   listProjectionSources: () => ipcRenderer.invoke('emuhub:list-projection-sources'),
   selectProjectionSource: id => ipcRenderer.invoke('emuhub:select-projection-source', id),
   scannerState: () => ipcRenderer.invoke('emuhub:scanner-state'),

@@ -24,12 +24,15 @@ import { Button } from "@/components/ui/button";
 import { useRetroSounds } from "@/hooks/useRetroSounds";
 import { retroScenes } from "@/lib/retro-scenes";
 import { useRetroMotion } from "@/hooks/useRetroMotion";
+import { useScreenTransition } from "@/hooks/useScreenTransition";
+import { ScreenTransition } from "@/components/ScreenTransition";
 import startMenuWallpaper from "@/assets/start-menu-wallpaper.svg";
 import { toast } from "sonner";
 import "@/retro.css";
 
 const Index = () => {
   const [started, setStarted] = useState(false);
+  const { screen, cover, reveal, waitForHandoff, cancel, completePhase, restoreFocus, isBusy: transitionBusy } = useScreenTransition();
   const collectionTitle = useRef<HTMLHeadingElement>(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [showDirectoryImport, setShowDirectoryImport] = useState(false);
@@ -81,6 +84,27 @@ const Index = () => {
     window.addEventListener("emuhub:controller-back", back);
     return () => window.removeEventListener("emuhub:controller-back", back);
   }, [inHub]);
+  useEffect(() => {
+    if (inHub) cancel();
+  }, [inHub, cancel]);
+  useEffect(() => {
+    const desktop = window.emuDesktop;
+    if (!desktop) return;
+    const unsubscribe = desktop.onLaunchTransition(async ({ token, name }) => {
+      const ready = await cover(`Launching ${name}…`);
+      try { await desktop.completeLaunchTransition(token, ready); } catch { cancel(); }
+    });
+    const unsubscribeReturn = desktop.onControllerReturn(cancel);
+    return () => { unsubscribe(); unsubscribeReturn(); };
+  }, [cover, cancel]);
+  const handleStart = async () => {
+    if (launchPending.current || transitionBusy()) return;
+    if (!await cover("Opening your library…")) return;
+    setStarted(true);
+    window.scrollTo({ top: 0, behavior: "instant" });
+    await reveal();
+    requestAnimationFrame(() => collectionTitle.current?.focus({ preventScroll: true }));
+  };
   const scene = retroScenes.find(entry => entry.id === sceneId)!;
   const nextScene = () => setSceneId(current => {
     const choices = retroScenes.filter(entry => entry.id !== current);
@@ -139,7 +163,7 @@ const Index = () => {
   };
   const handleLaunch = async (app: EmulationApp) => {
     const desktop = window.emuDesktop;
-    if (!desktop || launchPending.current) return;
+    if (!desktop || launchPending.current || transitionBusy()) return;
     launchPending.current = true;
     setLaunchingAppId(app.id);
     try {
@@ -150,10 +174,12 @@ const Index = () => {
       if (result.launched) {
         playLaunchChime();
         toast.success(`${app.name} started in its own Windows window.`);
+        await waitForHandoff();
       }
     } catch {
       toast.error("Could not start this app. Use Edit app to select its installed .exe again, and check that its supporting files are present.");
     } finally {
+      await reveal();
       launchPending.current = false;
       setLaunchingAppId(null);
     }
@@ -203,7 +229,7 @@ const Index = () => {
             <Button onClick={() => setShowDirectoryImport(true)} className="retro-button h-12 rounded-xl px-7"><FolderOpen className="mr-2 h-5 w-5" />Directory Folder</Button>
           </> : <Button onClick={() => setShowGameImport(true)} className="retro-button h-12 rounded-xl px-7"><FolderOpen className="mr-2 h-5 w-5" />Add Games Directory</Button>}
           <Button asChild className="retro-button h-12 rounded-xl px-7"><Link to="/hub"><Monitor className="mr-2 h-5 w-5" />App Projection Hub</Link></Button>
-        </div> : !inHub && <StartMenu onStart={() => setStarted(true)} />}
+        </div> : !inHub && <StartMenu onStart={handleStart} />}
       </section>
       {started && <main className="console-library relative z-10 mx-auto max-w-6xl p-4 sm:p-7">
         <h2 ref={collectionTitle} tabIndex={-1} className="retro-hud mb-5 text-xs text-yellow-300">Your library</h2>
@@ -245,6 +271,7 @@ const Index = () => {
       {showSettings && <AppearanceSettings onClose={() => setShowSettings(false)} background={background} onBackground={changeBackground} sceneId={sceneId} onScene={selectScene} shuffle={shuffle} onShuffle={value => { setShuffle(value); if (value) { setBackground(null); nextScene(); } }} onNext={() => { setBackground(null); nextScene(); }} upload={upload} dim={dim} onDim={setDim} paused={paused} onPaused={setPaused} />}
     </div>
     <Outlet context={{ apps }} />
+    <ScreenTransition state={screen} onComplete={completePhase} onRestoreFocus={restoreFocus} />
     </>
   );
 };

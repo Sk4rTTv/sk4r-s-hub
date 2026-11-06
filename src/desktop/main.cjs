@@ -8,8 +8,10 @@ const { scanAppDirectory } = require('./directory-scan.cjs');
 const { installLibraryScanner } = require('./library-scanner.cjs');
 const { installPlayStats } = require('./play-stats.cjs');
 const { installController } = require('./controller.cjs');
+const { installLaunchTransition } = require('./launch-transition.cjs');
 
 let window;
+let nativeLaunchPending = false;
 const runningEmulators = new Map();
 const executables = new Map();
 const directoryEntries = new Map();
@@ -25,6 +27,7 @@ function trustedFrame(frame) {
 function authorize(event) {
   if (!trustedFrame(event.senderFrame)) throw new Error('Untrusted launcher request.');
 }
+const waitForLaunchTransition = installLaunchTransition({ app, ipcMain, authorize, getWindow: () => window });
 installController({
   app, ipcMain, authorize, getWindow: () => window,
   canSend: () => window && !window.isDestroyed() && trustedFrame(window.webContents.mainFrame),
@@ -112,18 +115,27 @@ ipcMain.handle('emuhub:select-game-directory', event => selectDirectory(event, '
 ipcMain.handle('emuhub:launch-executable', async (event, id) => {
   authorize(event);
   if (typeof id !== 'string' || !executables.has(id)) throw new Error('Select this emulator again before launching.');
-  const entry = executables.get(id);
-  const executable = await checkedExecutable(entry.filePath);
-  const confirmation = await dialog.showMessageBox(window, { type: 'question', title: 'Launch emulator', message: `Open ${entry.name}?`, detail: `This runs the selected executable on your computer in its own window. Only launch apps you trust.\n\n${executable}`, buttons: ['Cancel', 'Launch'], defaultId: 0, cancelId: 0, noLink: true });
-  if (confirmation.response !== 1) return { launched: false };
-  authorize(event);
-  await new Promise((resolve, reject) => {
-    const child = spawn(executable, [], { cwd: path.dirname(executable), shell: false, detached: true, stdio: 'ignore', windowsHide: false });
-    child.once('error', () => { runningEmulators.delete(child); reject(new Error('Windows could not start this emulator. Check that it is installed with its required files.')); });
-    child.once('exit', () => runningEmulators.delete(child));
-    child.once('spawn', () => { runningEmulators.set(child, { id, name: entry.name }); child.unref(); resolve(); });
-  });
-  return { launched: true };
+  if (nativeLaunchPending) throw new Error('An emulator launch is already in progress.');
+  nativeLaunchPending = true;
+  try {
+    const entry = executables.get(id);
+    const executable = await checkedExecutable(entry.filePath);
+    authorize(event);
+    const confirmation = await dialog.showMessageBox(window, { type: 'question', title: 'Launch emulator', message: `Open ${entry.name}?`, detail: `This runs the selected executable on your computer in its own window. Only launch apps you trust.\n\n${executable}`, buttons: ['Cancel', 'Launch'], defaultId: 0, cancelId: 0, noLink: true });
+    if (confirmation.response !== 1) return { launched: false };
+    authorize(event);
+    if (!await waitForLaunchTransition(event, entry.name)) return { launched: false };
+    authorize(event);
+    const launchPath = await checkedExecutable(entry.filePath);
+    authorize(event);
+    await new Promise((resolve, reject) => {
+      const child = spawn(launchPath, [], { cwd: path.dirname(launchPath), shell: false, detached: true, stdio: 'ignore', windowsHide: false });
+      child.once('error', () => { runningEmulators.delete(child); reject(new Error('Windows could not start this emulator. Check that it is installed with its required files.')); });
+      child.once('exit', () => runningEmulators.delete(child));
+      child.once('spawn', () => { runningEmulators.set(child, { id, name: entry.name }); child.unref(); resolve(); });
+    });
+    return { launched: true };
+  } finally { nativeLaunchPending = false; }
 });
 
 ipcMain.handle('emuhub:list-projection-sources', async event => {

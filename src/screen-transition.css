@@ -1,0 +1,41 @@
+.screen-transition-blocker, .screen-transition-dialog {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100dvh;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.screen-transition-blocker { z-index: 200; }
+.screen-transition-dialog { z-index: 201; outline: none; }
+.screen-transition-fade {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background-color: #000;
+  color: #fff6cf;
+  opacity: 1;
+}
+.screen-transition-fade[data-phase='cover'] { animation: screen-cover 280ms steps(8, end) both; }
+.screen-transition-fade[data-phase='reveal'] { animation: screen-reveal 220ms steps(8, end) both; }
+.screen-transition-message {
+  display: flex;
+  max-width: min(32rem, 85vw);
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  text-align: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: .65rem;
+  line-height: 1.9;
+  overflow-wrap: anywhere;
+}
+@keyframes screen-cover { from { opacity: 0; } to { opacity: 1; } }
+@keyframes screen-reveal { from { opacity: 1; } to { opacity: 0; } }
+.screen-transition-fade[data-reduced-motion='true'] { animation-duration: 1ms; animation-timing-function: linear; }
+@media (prefers-reduced-motion: reduce) { .screen-transition-fade { animation-duration: 1ms !important; animation-timing-function: linear !important; } }

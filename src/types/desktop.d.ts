@@ -47,6 +47,8 @@ declare global {
       selectAppDirectory: () => Promise<AppDirectoryScan | null>;
       selectGameDirectory: () => Promise<AppDirectoryScan | null>;
       launchExecutable: (id: string) => Promise<{ launched: boolean }>;
+      onLaunchTransition: (callback: (transition: { token: string; name: string }) => void) => () => void;
+      completeLaunchTransition: (token: string, ready: boolean) => Promise<void>;
       listProjectionSources: () => Promise<ProjectionSource[]>;
       selectProjectionSource: (id: string) => Promise<void>;
       scannerState: () => Promise<import("./library-scanner").ScannerSnapshot>;
