@@ -2,9 +2,11 @@ import { File, Pencil, Trash2, ImagePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CartridgeDisplay } from "./CartridgeDisplay";
 import { MetadataDetails } from "./MetadataDetails";
+import { GamePlayStats } from "./GamePlayStats";
+import type { GamePlayStats as PlayStats } from "@/types/play-stats";
 import type { LibraryGame } from "@/types/game";
 
-export function GameCard({ game, onEdit, onCover, onRemove }: { game: LibraryGame; onEdit: (game: LibraryGame) => void; onCover: (game: LibraryGame) => void; onRemove: (id: string) => void }) {
+export function GameCard({ game, onEdit, onCover, onRemove, stats, loadingStats, statsUnavailable, onLog }: { game: LibraryGame; onEdit: (game: LibraryGame) => void; onCover: (game: LibraryGame) => void; onRemove: (id: string) => void; stats?: PlayStats; loadingStats: boolean; statsUnavailable: boolean; onLog: (game: LibraryGame) => void }) {
   return <article role="listitem" className="collection-card relative flex min-w-0 flex-col rounded-2xl border-2 border-indigo-500 bg-blue-950 p-3 text-white">
     <div className="flex items-center justify-between gap-2"><p className="text-xs font-bold uppercase tracking-wide text-cyan-200">{game.system}</p><span className="rounded-md border border-indigo-400 bg-indigo-900 px-2 py-1 font-mono text-xs text-blue-100">{game.fileName.split(".").pop()?.toUpperCase()}</span></div>
     <CartridgeDisplay app={game} />
@@ -19,5 +21,6 @@ export function GameCard({ game, onEdit, onCover, onRemove }: { game: LibraryGam
         <Button onClick={() => onRemove(game.id)} variant="outline" aria-label={`Remove ${game.name} from library`} className="h-auto min-h-9 rounded-lg border-red-400 bg-blue-950 py-2 text-red-200"><Trash2 className="h-4 w-4" /></Button>
       </div>
     </div>
+    <GamePlayStats name={game.name} stats={stats} loading={loadingStats} unavailable={statsUnavailable} onLog={() => onLog(game)} />
   </article>;
 }

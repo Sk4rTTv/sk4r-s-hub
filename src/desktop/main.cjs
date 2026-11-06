@@ -6,6 +6,7 @@ const { randomUUID } = require('node:crypto');
 const { spawn } = require('node:child_process');
 const { scanAppDirectory } = require('./directory-scan.cjs');
 const { installLibraryScanner } = require('./library-scanner.cjs');
+const { installPlayStats } = require('./play-stats.cjs');
 
 let window;
 const executables = new Map();
@@ -22,6 +23,7 @@ function trustedFrame(frame) {
 function authorize(event) {
   if (!trustedFrame(event.senderFrame)) throw new Error('Untrusted launcher request.');
 }
+installPlayStats({ app, ipcMain, authorize, resolveEntry: id => [...directoryEntries.entries()].find(([, entryId]) => entryId === id)?.[0] });
 const stopLibraryScanner = installLibraryScanner({
   ipcMain, dialog, getWindow: () => window, authorize,
   canSend: () => window && !window.isDestroyed() && trustedFrame(window.webContents.mainFrame),

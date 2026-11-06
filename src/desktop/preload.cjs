@@ -19,4 +19,6 @@ contextBridge.exposeInMainWorld('emuDesktop', {
     ipcRenderer.on('emuhub:library-scanner-event', listener);
     return () => ipcRenderer.removeListener('emuhub:library-scanner-event', listener);
   },
+  readPlayStats: ids => ipcRenderer.invoke('emuhub:read-play-stats', ids),
+  logPlaySession: (id, session) => ipcRenderer.invoke('emuhub:log-play-session', id, session),
 });

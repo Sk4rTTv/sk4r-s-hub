@@ -4,6 +4,9 @@ import { DirectoryImport } from "@/components/DirectoryImport";
 import { GamesLibrary } from "@/components/GamesLibrary";
 import { GameEditor } from "@/components/GameEditor";
 import { GameCoverMenu } from "@/components/GameCoverMenu";
+import { LogPlaySession } from "@/components/LogPlaySession";
+import { TotalHoursGamified } from "@/components/TotalHoursGamified";
+import { useGamePlayStats } from "@/hooks/useGamePlayStats";
 import { CartridgeArtwork } from "@/components/CartridgeArtwork";
 import { StartMenu } from "@/components/StartMenu";
 import { WebsiteMenu } from "@/components/WebsiteMenu";
@@ -35,7 +38,9 @@ const Index = () => {
   const [libraryTab, setLibraryTab] = useState("apps");
   const [editingGame, setEditingGame] = useState<LibraryGame>();
   const [coverGame, setCoverGame] = useState<LibraryGame>();
+  const [loggingGame, setLoggingGame] = useState<LibraryGame>();
   const [games, setGames] = useState<LibraryGame[]>([]);
+  const playStats = useGamePlayStats(games);
   const [editing, setEditing] = useState<EmulationApp>();
   const [artworkApp, setArtworkApp] = useState<EmulationApp>();
   const [apps, setApps] = useState<EmulationApp[]>([]);
@@ -183,6 +188,7 @@ const Index = () => {
           {"EmuHub".split("").map((letter, i) => <span key={i} style={{ color: ["var(--retro-red)", "var(--retro-gold)", "#65c649", "#65c649", "var(--retro-red)", "var(--retro-gold)"][i], transform: `rotate(${i % 2 ? 2 : -2}deg)` }}>{letter}</span>)}
         </h1>
         <p className="retro-hud mt-6 text-[length:calc(.625rem*var(--text-scale))] sm:text-xs">Your emulation apps and games. One hub.</p>
+        <TotalHoursGamified minutes={playStats.totalMinutes} sessions={playStats.sessionCount} loading={playStats.loading} error={playStats.error} onRetry={playStats.reload} />
         {started ? <div className="mt-7 flex flex-wrap justify-center gap-4">
           <Button onClick={() => setShowScanner(true)} className="retro-button h-12 rounded-xl px-7"><FolderSearch className="mr-2 h-5 w-5" />Automatic scanner</Button>
           {libraryTab === "apps" ? <>
@@ -201,7 +207,7 @@ const Index = () => {
             <TabsTrigger value="games" className="flex-1 flex-wrap gap-2 rounded-xl border-2 border-transparent px-3 py-3 text-xs text-blue-100 data-[state=active]:border-yellow-300 data-[state=active]:bg-yellow-300 data-[state=active]:text-blue-950 sm:px-5 sm:text-sm"><Gamepad2 className="h-5 w-5" />Games <span className="font-mono">({games.length})</span></TabsTrigger>
           </TabsList>
           <TabsContent value="apps" className="mt-0"><EmulationAppList apps={apps} onEdit={handleEdit} onArtwork={setArtworkApp} onDelete={handleDelete} onOpen={handleOpen} onLaunch={handleLaunch} launchingAppId={launchingAppId} onToggleFavorite={handleToggleFavorite} /></TabsContent>
-          <TabsContent value="games" className="mt-0"><GamesLibrary games={games} onImport={() => setShowGameImport(true)} onEdit={setEditingGame} onCover={setCoverGame} onRemove={id => setGames(current => current.filter(game => game.id !== id))} /></TabsContent>
+          <TabsContent value="games" className="mt-0"><GamesLibrary games={games} onImport={() => setShowGameImport(true)} onEdit={setEditingGame} onCover={setCoverGame} onRemove={id => setGames(current => current.filter(game => game.id !== id))} stats={playStats.stats} loadingStats={playStats.loading} statsUnavailable={!!playStats.error} onLog={setLoggingGame} /></TabsContent>
         </Tabs>
       </main>}
       <footer className="console-footer relative z-10 flex flex-wrap items-center justify-center gap-6 px-4 py-5 text-xs"><span className="flex items-center gap-2"><Gamepad2 className="h-6 w-6 text-slate-300" /> {started ? "Your apps & games" : "Choose your next adventure"}</span><span className="flex items-center gap-2"><Star className="h-5 w-5 fill-yellow-400 text-yellow-400" /> {apps.length} apps · {games.length} games</span></footer>
@@ -210,6 +216,10 @@ const Index = () => {
       {showDirectoryImport && <DirectoryImport kind="apps" existingKeys={apps.flatMap(app => [app.directoryKey, app.appFile ? directoryFileKey(app.appFile) : undefined].filter((key): key is string => !!key))} onClose={() => setShowDirectoryImport(false)} onImport={handleDirectoryImport} />}
       {showGameImport && <DirectoryImport kind="games" existingKeys={games.map(game => game.directoryKey)} onClose={() => setShowGameImport(false)} onImport={handleGameImport} />}
       {showScanner && <LibraryScanner state={scanner} onClose={() => setShowScanner(false)} />}
+      {loggingGame && <LogPlaySession key={loggingGame.id} game={loggingGame} saveFolder={playStats.saveFolder} onClose={() => setLoggingGame(undefined)} onSave={async session => {
+        await playStats.logSession(loggingGame, session);
+        toast.success(window.emuDesktop ? "Play session saved in the app’s saves folder." : "Play session logged for this preview session.");
+      }} />}
       {editingGame && <GameEditor game={editingGame} upload={upload} onClose={() => setEditingGame(undefined)} onSave={game => {
         setGames(current => current.map(entry => entry.id === game.id ? game : entry));
         setEditingGame(undefined);

@@ -34,6 +34,8 @@ declare global {
       retryScannerMetadata: (id: string, system: string, title: string) => Promise<void>;
       disconnectScanner: () => Promise<void>;
       onScannerEvent: (callback: (event: import("./library-scanner").ScannerEvent) => void) => () => void;
+      readPlayStats: (gameIds: string[]) => Promise<import("./play-stats").PlayStatsSnapshot>;
+      logPlaySession: (gameId: string, session: import("./play-stats").CompletedPlaySession) => Promise<import("./play-stats").PlayStatsSnapshot>;
     };
   }
 }
