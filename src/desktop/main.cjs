@@ -7,8 +7,10 @@ const { spawn } = require('node:child_process');
 const { scanAppDirectory } = require('./directory-scan.cjs');
 const { installLibraryScanner } = require('./library-scanner.cjs');
 const { installPlayStats } = require('./play-stats.cjs');
+const { installController } = require('./controller.cjs');
 
 let window;
+const runningEmulators = new Map();
 const executables = new Map();
 const directoryEntries = new Map();
 let scanningDirectory = false;
@@ -23,6 +25,35 @@ function trustedFrame(frame) {
 function authorize(event) {
   if (!trustedFrame(event.senderFrame)) throw new Error('Untrusted launcher request.');
 }
+installController({
+  app, ipcMain, authorize, getWindow: () => window,
+  canSend: () => window && !window.isDestroyed() && trustedFrame(window.webContents.mainFrame),
+  async returnToHub(foregroundPid) {
+    const tracked = [...runningEmulators.entries()];
+    const target = tracked.find(([child]) => child.pid === foregroundPid) ?? (window?.isFocused() ? tracked.at(-1) : undefined);
+    let closed = false;
+    let failed = false;
+    if (target) {
+      const [child] = target;
+      if (child.exitCode === null && child.signalCode === null && !child.killed) {
+        closed = await new Promise(resolve => {
+          const done = result => { clearTimeout(timeout); child.removeListener('exit', exited); resolve(result); };
+          const exited = () => done(true);
+          const timeout = setTimeout(() => done(false), 1500);
+          child.once('exit', exited);
+          try { if (!child.kill('SIGKILL')) done(false); } catch { done(false); }
+        });
+        failed = !closed;
+      }
+    }
+    if (window && !window.isDestroyed()) {
+      if (window.isMinimized()) window.restore();
+      window.show();
+      window.focus();
+    }
+    return { closed, error: failed, message: closed ? `${target[1].name} closed. Welcome back to EmuHub.` : failed ? 'The emulator could not be closed. It may still be running; no other processes were targeted.' : 'Returned to EmuHub. No tracked foreground emulator was closed.' };
+  },
+});
 installPlayStats({ app, ipcMain, authorize, resolveEntry: id => [...directoryEntries.entries()].find(([, entryId]) => entryId === id)?.[0] });
 const stopLibraryScanner = installLibraryScanner({
   ipcMain, dialog, getWindow: () => window, authorize,
@@ -85,10 +116,12 @@ ipcMain.handle('emuhub:launch-executable', async (event, id) => {
   const executable = await checkedExecutable(entry.filePath);
   const confirmation = await dialog.showMessageBox(window, { type: 'question', title: 'Launch emulator', message: `Open ${entry.name}?`, detail: `This runs the selected executable on your computer in its own window. Only launch apps you trust.\n\n${executable}`, buttons: ['Cancel', 'Launch'], defaultId: 0, cancelId: 0, noLink: true });
   if (confirmation.response !== 1) return { launched: false };
+  authorize(event);
   await new Promise((resolve, reject) => {
     const child = spawn(executable, [], { cwd: path.dirname(executable), shell: false, detached: true, stdio: 'ignore', windowsHide: false });
-    child.once('error', () => reject(new Error('Windows could not start this emulator. Check that it is installed with its required files.')));
-    child.once('spawn', () => { child.unref(); resolve(); });
+    child.once('error', () => { runningEmulators.delete(child); reject(new Error('Windows could not start this emulator. Check that it is installed with its required files.')); });
+    child.once('exit', () => runningEmulators.delete(child));
+    child.once('spawn', () => { runningEmulators.set(child, { id, name: entry.name }); child.unref(); resolve(); });
   });
   return { launched: true };
 });

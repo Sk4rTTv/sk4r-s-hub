@@ -9,6 +9,7 @@ import ProjectionHub from "./pages/ProjectionHub";
 import Settings from "./pages/Settings";
 import Websites from "./pages/Websites";
 import { InterfaceSettingsProvider } from "./contexts/InterfaceSettings";
+import { ControllerProvider } from "./contexts/Controller";
 
 const queryClient = new QueryClient();
 const Router = window.emuDesktop ? HashRouter : BrowserRouter;
@@ -20,6 +21,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <Router>
+        <ControllerProvider>
         <Routes>
           <Route path="/" element={<Index />}>
             <Route path="hub" element={<ProjectionHub />} />
@@ -29,6 +31,7 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        </ControllerProvider>
       </Router>
     </TooltipProvider>
   </QueryClientProvider>

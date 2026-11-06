@@ -76,6 +76,11 @@ const Index = () => {
     if (inHub) setStarted(false);
     else if (started) collectionTitle.current?.focus({ preventScroll: true });
   }, [inHub, started]);
+  useEffect(() => {
+    const back = () => { if (!inHub) { setStarted(false); window.scrollTo({ top: 0, behavior: "instant" }); } };
+    window.addEventListener("emuhub:controller-back", back);
+    return () => window.removeEventListener("emuhub:controller-back", back);
+  }, [inHub]);
   const scene = retroScenes.find(entry => entry.id === sceneId)!;
   const nextScene = () => setSceneId(current => {
     const choices = retroScenes.filter(entry => entry.id !== current);

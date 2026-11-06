@@ -1,0 +1,44 @@
+.controller-layout { padding-bottom: 5rem; }
+.controller-hud {
+  position: fixed;
+  z-index: 70;
+  inset-inline: .75rem;
+  bottom: .75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .75rem;
+  border: 2px solid var(--ui-highlight);
+  border-radius: 1rem;
+  padding: .7rem 1rem;
+  background: var(--ui-panel);
+  color: var(--ui-text);
+  box-shadow: 0 4px 16px rgb(15 23 42 / .3);
+  font-size: .75rem;
+  line-height: 1.6;
+  pointer-events: none;
+}
+:is(.retro-world, .retro-dialog, .controller-keyboard) :is(button, a, input, select, textarea, [role='option'], [role='menuitem'], [role='slider']) {
+  transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+[data-controller-focus='true'] {
+  outline: 3px solid var(--ui-highlight) !important;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 5px var(--ui-panel) !important;
+  scroll-margin: 5rem 1rem;
+}
+:is(button, a, [role='option'], [role='menuitem'])[data-controller-focus='true'] {
+  background-color: var(--ui-accent) !important;
+  color: var(--ui-accent-text) !important;
+  border-color: var(--ui-highlight) !important;
+}
+[data-controller-focus='true'] :is(svg, span) { color: inherit !important; }
+.controller-keyboard { background: var(--ui-panel) !important; color: var(--ui-text) !important; }
+.controller-keyboard .text-blue-100 { color: var(--ui-text); }
+:is([role='option'], [role='menuitem'], [role='combobox'], [role='slider']) { transition: background-color 160ms ease, color 160ms ease, box-shadow 160ms ease; }
+.start-menu [data-controller-focus='true'] .menu-cursor { opacity: 1; }
+@media (min-width: 768px) { .controller-hud { inset-inline: auto; left: 50%; transform: translateX(-50%); width: max-content; max-width: calc(100vw - 3rem); } }
+@media (prefers-reduced-motion: reduce) {
+  :is(.retro-world, .retro-dialog, .controller-keyboard) :is(button, a, input, select, textarea, [role='option'], [role='menuitem'], [role='slider']),
+  :is([role='option'], [role='menuitem'], [role='combobox'], [role='slider']) { transition: none; }
+}

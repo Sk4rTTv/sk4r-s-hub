@@ -17,9 +17,32 @@ export interface AppDirectoryScan {
   skippedDirectories: number;
 }
 
+export interface ControllerState {
+  nativeAvailable: boolean;
+  connected: boolean;
+  shortcutEnabled: boolean;
+  message: string;
+}
+export interface ControllerPacket {
+  buttons: boolean[];
+  axes: number[];
+  suspended: boolean;
+}
+export interface ControllerReturn {
+  closed: boolean;
+  error?: boolean;
+  message: string;
+}
+
 declare global {
   interface Window {
     emuDesktop?: {
+      controllerState: () => Promise<ControllerState>;
+      setControllerShortcut: (enabled: boolean) => Promise<ControllerState>;
+      activateControllerControl: (key: "Return" | "Space") => Promise<void>;
+      onControllerState: (callback: (state: ControllerState) => void) => () => void;
+      onControllerInput: (callback: (packet: ControllerPacket) => void) => () => void;
+      onControllerReturn: (callback: (result: ControllerReturn) => void) => () => void;
       selectExecutable: () => Promise<NativeExecutable | null>;
       selectAppDirectory: () => Promise<AppDirectoryScan | null>;
       selectGameDirectory: () => Promise<AppDirectoryScan | null>;

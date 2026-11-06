@@ -24,6 +24,6 @@ export function StartMenu({ onStart }: { onStart: () => void }) {
       <Button asChild variant="outline" className="start-menu-option w-full justify-start rounded-xl border-2 border-indigo-300 bg-indigo-950 px-4 py-4 text-white"><Link to="/websites"><ChevronRight className="menu-cursor mr-2 h-4 w-4 shrink-0" /><Globe className="mr-3 h-5 w-5 shrink-0" />Websites</Link></Button>
       <Button asChild variant="outline" className="start-menu-option w-full justify-start rounded-xl border-2 border-indigo-300 bg-indigo-950 px-4 py-4 text-white"><Link to="/settings"><ChevronRight className="menu-cursor mr-2 h-4 w-4 shrink-0" /><Settings className="mr-3 h-5 w-5 shrink-0" />Settings</Link></Button>
     </nav>
-    <p className="mt-5 text-xs leading-6 text-blue-100">Choose an option to begin.<br /><span className="text-blue-200">↑ ↓ to select · Enter to open</span></p>
+    <p className="mt-5 text-xs leading-6 text-blue-100">Choose an option to begin.<br /><span className="text-blue-200">D-pad / ↑ ↓ to select · A / Enter to open · Y for Settings</span></p>
   </div>;
 }

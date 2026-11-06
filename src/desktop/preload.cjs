@@ -1,6 +1,18 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
+function controllerSubscription(channel, callback) {
+  const listener = (_event, payload) => callback(payload);
+  ipcRenderer.on(channel, listener);
+  return () => ipcRenderer.removeListener(channel, listener);
+}
+
 contextBridge.exposeInMainWorld('emuDesktop', {
+  controllerState: () => ipcRenderer.invoke('emuhub:controller-state'),
+  setControllerShortcut: enabled => ipcRenderer.invoke('emuhub:controller-shortcut', enabled),
+  activateControllerControl: key => ipcRenderer.invoke('emuhub:controller-activate', key),
+  onControllerState: callback => controllerSubscription('emuhub:controller-state-event', callback),
+  onControllerInput: callback => controllerSubscription('emuhub:controller-input', callback),
+  onControllerReturn: callback => controllerSubscription('emuhub:controller-return', callback),
   selectExecutable: () => ipcRenderer.invoke('emuhub:select-executable'),
   selectAppDirectory: () => ipcRenderer.invoke('emuhub:select-app-directory'),
   selectGameDirectory: () => ipcRenderer.invoke('emuhub:select-game-directory'),
