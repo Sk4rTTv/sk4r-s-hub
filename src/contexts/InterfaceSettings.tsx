@@ -2,10 +2,13 @@ import { createContext, useContext, useLayoutEffect, useState, type ReactNode } 
 import { uiThemes, readableText, readableAccent, type UiColors } from "@/lib/ui-colors";
 import "@/interface-settings.css";
 import "@/ui-colors.css";
+import "@/crt-effects.css";
 
 interface InterfaceSettingsValue {
   textSize: number;
   guiSize: number;
+  crtEnabled: boolean;
+  setCrtEnabled: (enabled: boolean) => void;
   colors: UiColors;
   setColors: (colors: UiColors) => void;
   resetColors: () => void;
@@ -18,10 +21,15 @@ const InterfaceSettingsContext = createContext<InterfaceSettingsValue | null>(nu
 export function InterfaceSettingsProvider({ children }: { children: ReactNode }) {
   const [textSize, setTextSize] = useState(100);
   const [guiSize, setGuiSize] = useState(100);
+  const [crtEnabled, setCrtEnabled] = useState(false);
   const [colors, updateColors] = useState<UiColors>(uiThemes[0].colors);
   const setColors = (value: UiColors) => {
     if (Object.values(value).every(color => /^#[0-9a-f]{6}$/i.test(color))) updateColors(value);
   };
+  useLayoutEffect(() => {
+    document.documentElement.dataset.crtEnabled = String(crtEnabled);
+    return () => { delete document.documentElement.dataset.crtEnabled; };
+  }, [crtEnabled]);
   useLayoutEffect(() => {
     const root = document.documentElement;
     const variables = {
@@ -49,7 +57,7 @@ export function InterfaceSettingsProvider({ children }: { children: ReactNode })
     };
   }, [textSize, guiSize]);
 
-  return <InterfaceSettingsContext.Provider value={{ textSize, guiSize, colors, setColors, resetColors: () => updateColors(uiThemes[0].colors), setTextSize, setGuiSize, reset: () => { setTextSize(100); setGuiSize(100); } }}>{children}</InterfaceSettingsContext.Provider>;
+  return <InterfaceSettingsContext.Provider value={{ textSize, guiSize, crtEnabled, setCrtEnabled, colors, setColors, resetColors: () => updateColors(uiThemes[0].colors), setTextSize, setGuiSize, reset: () => { setTextSize(100); setGuiSize(100); } }}>{children}</InterfaceSettingsContext.Provider>;
 }
 
 export function useInterfaceSettings() {

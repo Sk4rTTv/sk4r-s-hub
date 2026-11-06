@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { UiColorSettings } from "@/components/UiColorSettings";
 import { ControllerSettings } from "@/components/ControllerSettings";
+import { CrtSettings } from "@/components/CrtSettings";
 import { useInterfaceSettings } from "@/contexts/InterfaceSettings";
 import "@/retro.css";
 
@@ -25,6 +26,7 @@ export default function Settings() {
           <h2 className="text-2xl font-bold">Make everything your own.</h2>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-blue-100">Colors and sizes apply instantly throughout EmuHub, including the new Websites menu. Interface size scales the overall layout; text size adjusts the lettering separately.</p>
         </section>
+        <CrtSettings />
         <ControllerSettings />
         <UiColorSettings />
         <div className="grid gap-5 md:grid-cols-2">

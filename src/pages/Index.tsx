@@ -171,7 +171,6 @@ const Index = () => {
         <div className="absolute inset-0 bg-blue-950" style={{ opacity: started ? dim / 100 : 0.12 }} />
       </div>
       <div className="console-shell relative mx-auto max-w-6xl overflow-hidden rounded-3xl">
-      <div aria-hidden="true" className="crt-lines pointer-events-none absolute inset-0 z-40" />
       <header className="console-header relative z-10 mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-5 py-4 sm:px-8">
         <div className="flex items-center gap-3"><Gamepad2 className="h-8 w-8 text-[var(--retro-gold)]" /><span className="retro-hud text-xs">EmuHub</span></div>
         <div className="flex flex-wrap items-center gap-3">

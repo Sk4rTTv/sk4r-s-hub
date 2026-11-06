@@ -1,0 +1,42 @@
+:root { --crt-text-fringe: 0 0 0 transparent; }
+:root[data-crt-enabled='true'] {
+  --crt-text-fringe: .45px 0 0 rgb(255 82 112 / .2), -.45px 0 0 rgb(55 185 255 / .2);
+}
+:root[data-crt-enabled='true'] .console-shell { position: relative; }
+:root[data-crt-enabled='true'] :is(.console-shell, .retro-dialog) {
+  isolation: isolate;
+  border-radius: clamp(1.5rem, 4vw, 2.75rem);
+}
+:root[data-crt-enabled='true'] :is(.console-shell, .retro-dialog)::before,
+:root[data-crt-enabled='true'] :is(.console-shell, .retro-dialog)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 45;
+  border-radius: inherit;
+  pointer-events: none;
+}
+:root[data-crt-enabled='true'] :is(.console-shell, .retro-dialog)::before {
+  box-shadow: inset 0 0 30px 7px rgb(5 11 32 / .2), inset 0 0 3px 1px rgb(255 255 255 / .14);
+}
+:root[data-crt-enabled='true'] :is(.console-shell, .retro-dialog)::after {
+  opacity: .1;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Cpath d='M0 0h4v1H0Z' fill='%23050b20'/%3E%3C/svg%3E");
+}
+:root[data-crt-enabled='true'] :is(.console-shell, .retro-dialog) :is(h1, h2, h3, h4, p, label, button, a, input, textarea, select, [role='option'], [role='menuitem']) {
+  text-shadow: var(--crt-text-fringe);
+}
+:root .retro-world .crt-switch {
+  background-color: var(--ui-panel) !important;
+  border-color: var(--ui-border) !important;
+  box-shadow: inset 0 1px 3px rgb(5 11 32 / .2);
+}
+:root .retro-world .crt-switch[data-state='checked'] { background-color: var(--ui-accent) !important; }
+:root .retro-world .crt-switch > span { background-color: var(--ui-text); }
+:root .retro-world .crt-switch[data-state='checked'] > span { background-color: var(--ui-accent-text); }
+html:root[data-crt-enabled] .retro-world button.crt-switch[role='switch'][data-state]:is(:hover, :focus-visible, [data-controller-focus='true']) {
+  background-color: var(--ui-accent) !important;
+}
+html:root[data-crt-enabled] .retro-world button.crt-switch[role='switch'][data-state]:is(:hover, :focus-visible, [data-controller-focus='true']) > span {
+  background-color: var(--ui-accent-text);
+}
