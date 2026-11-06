@@ -1,15 +1,17 @@
 import { useMemo, useState } from "react";
-import { Search, Gamepad2, FolderOpen, X } from "lucide-react";
+import { Search, Gamepad2, FolderOpen, X, LayoutGrid, PanelsTopLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { GameCard } from "./GameCard";
+import { GameBoxArtGrid } from "./GameBoxArtGrid";
 import type { LibraryGame } from "@/types/game";
 import type { GamePlayStats } from "@/types/play-stats";
 
 export function GamesLibrary({ games, onImport, onEdit, onCover, onRemove, stats, loadingStats, statsUnavailable, onLog }: { games: LibraryGame[]; onImport: () => void; onEdit: (game: LibraryGame) => void; onCover: (game: LibraryGame) => void; onRemove: (id: string) => void; stats: Record<string, GamePlayStats>; loadingStats: boolean; statsUnavailable: boolean; onLog: (game: LibraryGame) => void }) {
   const [search, setSearch] = useState("");
   const [console, setConsole] = useState("all");
+  const [view, setView] = useState<"box-art" | "cards">("box-art");
   const consoles = useMemo(() => Array.from(new Set(games.map(game => game.system))).sort(), [games]);
   const groups = useMemo(() => {
     const byConsole = new Map<string, LibraryGame[]>();
@@ -27,11 +29,15 @@ export function GamesLibrary({ games, onImport, onEdit, onCover, onRemove, stats
       <div className="relative min-w-0 flex-1 basis-64"><Search className="absolute left-3 top-3 h-5 w-5 text-blue-100" /><Input aria-label="Search games" placeholder="Search games or consoles…" value={search} onChange={event => setSearch(event.target.value)} className="rounded-xl pl-10" /></div>
       <Select value={console} onValueChange={setConsole}><SelectTrigger aria-label="Filter games by console" className="w-full rounded-xl sm:w-52"><SelectValue /></SelectTrigger><SelectContent className="retro-menu rounded-xl"><SelectItem value="all">All consoles</SelectItem>{consoles.map(entry => <SelectItem key={entry} value={entry}>{entry}</SelectItem>)}</SelectContent></Select>
       {(search || console !== "all") && <Button variant="outline" className="rounded-xl border-indigo-300 bg-blue-950 text-white" onClick={() => { setSearch(""); setConsole("all"); }}><X className="mr-2 h-4 w-4" />Clear</Button>}
+      <div role="group" aria-label="Game library view" className="retro-sort flex w-full flex-wrap gap-1 rounded-xl border p-1 sm:w-auto">
+        <Button type="button" variant="ghost" aria-pressed={view === "box-art"} onClick={() => setView("box-art")} className="h-auto min-h-10 flex-1 gap-2 rounded-lg px-3 py-2 text-xs"><LayoutGrid className="h-4 w-4" />Box art</Button>
+        <Button type="button" variant="ghost" aria-pressed={view === "cards"} onClick={() => setView("cards")} className="h-auto min-h-10 flex-1 gap-2 rounded-lg px-3 py-2 text-xs"><PanelsTopLeft className="h-4 w-4" />Detailed cards</Button>
+      </div>
     </div>
-    <p className="text-xs leading-5 text-blue-200">Your games are sorted into console shelves. Open game files in your emulator to play, then log completed sessions below their cards. Removing a cartridge does not delete its file or saved playtime.</p>
+    <p className="text-xs leading-5 text-blue-200">{view === "box-art" ? "Select a cover with A or click to see game details, change artwork, and log play sessions." : "Your games are sorted into console shelves. Open game files in your emulator to play, then log completed sessions below their cards."} Removing a game does not delete its file or saved playtime.</p>
     {groups.map(([system, entries]) => <section key={system} aria-label={`${system} games`} className="space-y-4">
       <header className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 border-indigo-500 bg-indigo-950 px-5 py-4"><h3 className="retro-hud flex items-center gap-3 text-xs text-yellow-200"><Gamepad2 className="h-6 w-6 shrink-0 text-cyan-300" />{system}</h3><span className="rounded-lg bg-blue-950 px-3 py-1 font-mono text-sm text-cyan-200">{entries.length} {entries.length === 1 ? "game" : "games"}</span></header>
-      <div role="list" aria-label={`${system} game cartridges`} className="grid grid-cols-1 gap-5 min-[420px]:grid-cols-2 md:grid-cols-3 md:gap-7 xl:grid-cols-4">{entries.map(game => <GameCard key={game.id} game={game} onEdit={onEdit} onCover={onCover} onRemove={onRemove} stats={stats[game.directoryKey]} loadingStats={loadingStats} statsUnavailable={statsUnavailable} onLog={onLog} />)}</div>
+      {view === "box-art" ? <GameBoxArtGrid games={entries} onEdit={onEdit} onCover={onCover} onRemove={onRemove} stats={stats} loadingStats={loadingStats} statsUnavailable={statsUnavailable} onLog={onLog} /> : <div role="list" aria-label={`${system} game cartridges`} className="grid grid-cols-1 gap-5 min-[420px]:grid-cols-2 md:grid-cols-3 md:gap-7 xl:grid-cols-4">{entries.map(game => <GameCard key={game.id} game={game} onEdit={onEdit} onCover={onCover} onRemove={onRemove} stats={stats[game.directoryKey]} loadingStats={loadingStats} statsUnavailable={statsUnavailable} onLog={onLog} />)}</div>}
     </section>)}
     {!groups.length && <div className="rounded-2xl border-2 border-indigo-400 bg-indigo-950 px-5 py-12 text-center"><Gamepad2 className="mx-auto mb-5 h-16 w-16 text-yellow-300" /><h3 className="retro-hud mb-4 text-xs text-yellow-100">{games.length ? "No matching games" : "Build your game collection"}</h3><p className="mx-auto mb-6 max-w-md text-sm leading-6 text-blue-100">{games.length ? "Clear your filters or try another title." : "Import a directory of game files, choose their consoles, and give each cartridge its own artwork."}</p>{!games.length && <Button onClick={onImport} className="retro-button rounded-xl"><FolderOpen className="mr-2 h-5 w-5" />Add Games Directory</Button>}</div>}
     <p role="status" className="text-center text-xs text-blue-100">Showing {visibleCount} of {games.length} games · {consoles.length} {consoles.length === 1 ? "console" : "consoles"}</p>
